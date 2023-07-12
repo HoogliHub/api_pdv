@@ -14,5 +14,6 @@ Route::group(['prefix' => 'enjoy', 'as' => 'enjoy.' ], function () {
     Route::resource('clients', ClientsController::class, ['only' => [
         'index', 'create', 'show', 'store', 'destroy'
     ]]);
-    Route::put('/products/{id}', [ClientsController::class, 'edit']);
+
+    Route::put('/clients/{id}', [ClientsController::class, 'edit']);
 });

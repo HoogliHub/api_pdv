@@ -45,50 +45,34 @@ class ClientsController extends Controller
 
 
             if (isset($requestClient['Customer']['name'])) {
-
-            }
-
-            if (isset($requestClient['Customer']['rg'])) {
-
+                    $data['name'] = $requestClient['Customer']['name'];
             }
 
             if (isset($requestClient['Customer']['cpf'])) {
-
-            }
-
-            if (isset($requestClient['Customer']['phone'])) {
-
+                    $data['cpf'] = $requestClient['Customer']['cpf'];
             }
 
             if (isset($requestClient['Customer']['cellphone'])) {
-
-            }
-
-            if (isset($requestClient['Customer']['email'])) {
-
-            }
-
-            if (isset($requestClient['Customer']['address'])) {
-
-            }
-            if (isset($requestClient['Customer']['zip_code'])) {
-
-            }
-
-            if (isset($requestClient['Customer']['number'])) {
-
-            }
-
-            if (isset($requestClient['Customer']['complement'])) {
-
+                    $data['phone'] = $requestClient['Customer']['cellphone'];
             }
 
             if (isset($requestClient['Customer']['city'])) {
+                    $data['city'] = $requestClient['Customer']['city'];
+            }
 
+            if (isset($requestClient['Customer']['email'])) {
+                    $data['email'] = $requestClient['Customer']['email'];
             }
 
             if (isset($requestClient['Customer']['state'])) {
+                $data['state'] = $requestClient['Customer']['state'];
+            }
+            if (isset($requestClient['Customer']['address'])) {
+                $data['address'] = $requestClient['Customer']['address'];
+            }
 
+            if (isset($requestClient['Customer']['zip_code'])) {
+                $data['postal_code'] = $requestClient['Customer']['zip_code'];
             }
 
             $response = Http::post($url . 'api/client', $data);
@@ -122,15 +106,7 @@ class ClientsController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function edit(Request $request, string $id)
     {
         try {
             $url = config('enjoy.url');
@@ -139,59 +115,51 @@ class ClientsController extends Controller
 
 
             if (isset($requestClient['Customer']['name'])) {
-
-            }
-
-            if (isset($requestClient['Customer']['rg'])) {
-
+                $data['name'] = $requestClient['Customer']['name'];
             }
 
             if (isset($requestClient['Customer']['cpf'])) {
-
-            }
-
-            if (isset($requestClient['Customer']['phone'])) {
-
+                $data['cpf'] = $requestClient['Customer']['cpf'];
             }
 
             if (isset($requestClient['Customer']['cellphone'])) {
-
-            }
-
-            if (isset($requestClient['Customer']['email'])) {
-
-            }
-
-            if (isset($requestClient['Customer']['address'])) {
-
-            }
-            if (isset($requestClient['Customer']['zip_code'])) {
-
-            }
-
-            if (isset($requestClient['Customer']['number'])) {
-
-            }
-
-            if (isset($requestClient['Customer']['complement'])) {
-
+                $data['phone'] = $requestClient['Customer']['cellphone'];
             }
 
             if (isset($requestClient['Customer']['city'])) {
+                $data['city'] = $requestClient['Customer']['city'];
+            }
 
+            if (isset($requestClient['Customer']['email'])) {
+                $data['email'] = $requestClient['Customer']['email'];
             }
 
             if (isset($requestClient['Customer']['state'])) {
-
+                $data['state'] = $requestClient['Customer']['state'];
+            }
+            if (isset($requestClient['Customer']['address'])) {
+                $data['address'] = $requestClient['Customer']['address'];
             }
 
-            $response = Http::post($url . 'api/client/'.$id, $data);
+            if (isset($requestClient['Customer']['zip_code'])) {
+                $data['postal_code'] = $requestClient['Customer']['zip_code'];
+            }
+
+            $response = Http::put($url . 'api/client/'.$id, $data);
 
             return $response;
 
         } catch (\Exception $e) {
-            throw new \Exception($e->getCode());
+            throw new \Exception($e->getMessage());
         }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+       //
     }
 
     /**
