@@ -13,53 +13,13 @@ class ProductsController extends Controller
     public function index(Request $request)
     {
         try {
-            $url = config('url');
-            $reply = Http::get($url . '/api/product');
+
+            $url = config('enjoy.url');
+            $reply = Http::get($url . 'api/products');
 
             $response = $reply->json();
-            $data = [
-                "paging" => $response['paging'],
-                "id" => $response['id'],
-                "name" => $response['name'],
-                "description" => $response['description'],
-                "content" => $response['content'],
-                "status" => $response['status'],
-                "sku" => $response['sku'],
-                "quantity" => $response['quantity'],
-                "featured" => $response['featured'],
-                "price" => $response['price'],
-                "sale_price" => $response['sale_price'],
-                "lenght" => $response['lenght'],
-                "wide" => $response['wide'],
-                "height" => $response['height'],
-                "weight" => $response['weight'],
-                "updated_at" => $response['updated_at'],
-                "slug" => $response['slug'],
-                "unit_price" => $response['unit_price'],
-                "purchase_price" => $response['purchase_price'],
-                "total" => $response['total'],
-                "discount_end_date" => $response['discount_end_date'],
-                "cubic_weight" => $response,
-                "stock" => $response['stock'],
-                "category_id" => $response['category_id'],
-                "published" => $response['published'],
-                "thumbnail_img" => $response['thumbnail_img'],
-                "atributes" => $response['atributes'],
-                "colors" => $response['colors'],
-                "min_qty" => $response['min_qty'],
-                "low_stock_quantity" => $response['low_stock_quantity'],
-                "meta_title" => $response['meta_title'],
-                "meta_description" => $response['meta_description'],
-                "video_link" => $response['video_link'],
-                "variant_product" => $response['variant_product'],
-                "variations" => $response['variations'],
-                "colors" => $response['colors'],
-                "tags" => $response['tags'],
-                "attributes" => $response['attributes'],
-                "choice_options" => $response['choice_options']
-            ];
 
-            return $data;
+            return $response;
         } catch (\Exception $e) {
             throw new \Exception($e->getCode());
         }
@@ -80,51 +40,47 @@ class ProductsController extends Controller
     public function store(Request $request)
     {
         try {
-            $url = config('url');
+            $url = config('enjoy.url');
+
+            $requestProduct = $request->all();
 
             $data = [
-                "id" => $request['id'],
-                "name" => $request['name'],
-                "description" => $request['description'],
-                "content" => $request['content'],
-                "status" => $request['status'],
-                "sku" => $request['sku'],
-                "quantity" => $request['quantity'],
-                "featured" => $request['featured'],
-                "price" => $request['price'],
-                "sale_price" => $request['sale_price'],
-                "lenght" => $request['lenght'],
-                "wide" => $request['wide'],
-                "height" => $request['height'],
-                "weight" => $request['weight'],
-                "updated_at" => $request['updated_at'],
-                "slug" => $request['slug'],
-                "unit_price" => $request['unit_price'],
-                "purchase_price" => $request['purchase_price'],
-                "total" => $request['total'],
-                "discount_end_date" => $request['discount_end_date'],
-                "cubic_weight" => $request,
-                "stock" => $request['stock'],
-                "category_id" => $request['category_id'],
-                "published" => $request['published'],
-                "thumbnail_img" => $request['thumbnail_img'],
-                "atributes" => $request['atributes'],
-                "colors" => $request['colors'],
-                "min_qty" => $request['min_qty'],
-                "low_stock_quantity" => $request['low_stock_quantity'],
-                "meta_title" => $request['meta_title'],
-                "meta_description" => $request['meta_description'],
-                "video_link" => $request['video_link'],
-                "variant_product" => $request['variant_product'],
-                "variations" => $request['variations'],
-                "colors" => $request['colors'],
-                "tags" => $request['tags'],
-                "attributes" => $request['attributes'],
-                "choice_options" => $request['choice_options']
+                "added_by" => "pdv",
             ];
-            $response = Http::post($url . '/api/product', $data);
 
-            return $response->json();
+            if (isset($requestProduct['Product']['name'])) {
+                $data["name"] = $requestProduct['Product']['name'];
+                $data["slug"] = $requestProduct['Product']['name'];
+            }
+
+            if (isset($requestProduct['Product']['category_id'])) {
+                $data["category_id"] = $requestProduct['Product']['category_id'];
+            }
+
+            if (isset($requestProduct['Product']['brand'])) {
+                $data["brand_name"] = $requestProduct['Product']['brand'];
+            }
+
+            if (isset($requestProduct['Product']['weight'])) {
+                $data["weight"] = $requestProduct['Product']['weight'];
+            }
+
+            if (isset($requestProduct['Product']['price'])) {
+                $data["unit_price"] = $requestProduct['Product']['price'];
+            }
+
+            if (isset($requestProduct['Product']['description'])) {
+                $data["description"] = $requestProduct['Product']['description'];
+            }
+
+            if (isset($requestProduct['Product']['stock'])) {
+                $data["current_stock"] = $requestProduct['Product']['stock'];
+            }
+
+
+            $response = Http::post($url . 'api/product', $data);
+
+            return $response;
 
         } catch (\Exception $e) {
             throw new \Exception($e->getCode());
@@ -137,53 +93,13 @@ class ProductsController extends Controller
     public function show(string $id)
     {
         try {
-            $url = config('url');
-            $reply = Http::get($url . '/api/product/'.$id);
+            $url = config('enjoy.url');
+
+            $reply = Http::get($url . 'api/product/' . $id);
 
             $response = $reply->json();
 
-            $data = [
-                "id" => $response['id'],
-                "name" => $response['name'],
-                "description" => $response['description'],
-                "content" => $response['content'],
-                "status" => $response['status'],
-                "sku" => $response['sku'],
-                "quantity" => $response['quantity'],
-                "featured" => $response['featured'],
-                "price" => $response['price'],
-                "sale_price" => $response['sale_price'],
-                "lenght" => $response['lenght'],
-                "wide" => $response['wide'],
-                "height" => $response['height'],
-                "weight" => $response['weight'],
-                "updated_at" => $response['updated_at'],
-                "slug" => $response['slug'],
-                "unit_price" => $response['unit_price'],
-                "purchase_price" => $response['purchase_price'],
-                "total" => $response['total'],
-                "discount_end_date" => $response['discount_end_date'],
-                "cubic_weight" => $response,
-                "stock" => $response['stock'],
-                "category_id" => $response['category_id'],
-                "published" => $response['published'],
-                "thumbnail_img" => $response['thumbnail_img'],
-                "atributes" => $response['atributes'],
-                "colors" => $response['colors'],
-                "min_qty" => $response['min_qty'],
-                "low_stock_quantity" => $response['low_stock_quantity'],
-                "meta_title" => $response['meta_title'],
-                "meta_description" => $response['meta_description'],
-                "video_link" => $response['video_link'],
-                "variant_product" => $response['variant_product'],
-                "variations" => $response['variations'],
-                "colors" => $response['colors'],
-                "tags" => $response['tags'],
-                "attributes" => $response['attributes'],
-                "choice_options" => $response['choice_options']
-            ];
-
-            return $data;
+            return $response;
 
         } catch (\Exception $e) {
             throw new \Exception($e->getCode());
@@ -193,54 +109,49 @@ class ProductsController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Request $request, string $id)
     {
         try {
-            $url = config('url');
+            $url = config('enjoy.url');
+
+            $requestProduct = $request->all();
 
             $data = [
-                "id" => $request['id'],
-                "name" => $request['name'],
-                "description" => $request['description'],
-                "content" => $request['content'],
-                "status" => $request['status'],
-                "sku" => $request['sku'],
-                "quantity" => $request['quantity'],
-                "featured" => $request['featured'],
-                "price" => $request['price'],
-                "sale_price" => $request['sale_price'],
-                "lenght" => $request['lenght'],
-                "wide" => $request['wide'],
-                "height" => $request['height'],
-                "weight" => $request['weight'],
-                "updated_at" => $request['updated_at'],
-                "slug" => $request['slug'],
-                "unit_price" => $request['unit_price'],
-                "purchase_price" => $request['purchase_price'],
-                "total" => $request['total'],
-                "discount_end_date" => $request['discount_end_date'],
-                "cubic_weight" => $request,
-                "stock" => $request['stock'],
-                "category_id" => $request['category_id'],
-                "published" => $request['published'],
-                "thumbnail_img" => $request['thumbnail_img'],
-                "atributes" => $request['atributes'],
-                "colors" => $request['colors'],
-                "min_qty" => $request['min_qty'],
-                "low_stock_quantity" => $request['low_stock_quantity'],
-                "meta_title" => $request['meta_title'],
-                "meta_description" => $request['meta_description'],
-                "video_link" => $request['video_link'],
-                "variant_product" => $request['variant_product'],
-                "variations" => $request['variations'],
-                "colors" => $request['colors'],
-                "tags" => $request['tags'],
-                "attributes" => $request['attributes'],
-                "choice_options" => $request['choice_options']
+                "added_by" => "pdv",
             ];
-            $response = Http::post($url . '/api/product/'.$id, $data);
 
-            return $response->json();
+            if (isset($requestProduct['Product']['name'])) {
+                $data["name"] = $requestProduct['Product']['name'];
+                $data["slug"] = $requestProduct['Product']['name'];
+            }
+
+            if (isset($requestProduct['Product']['category_id'])) {
+                $data["category_id"] = $requestProduct['Product']['category_id'];
+            }
+
+            if (isset($requestProduct['Product']['brand'])) {
+                $data["brand_name"] = $requestProduct['Product']['brand'];
+            }
+
+            if (isset($requestProduct['Product']['weight'])) {
+                $data["weight"] = $requestProduct['Product']['weight'];
+            }
+
+            if (isset($requestProduct['Product']['price'])) {
+                $data["unit_price"] = $requestProduct['Product']['price'];
+            }
+
+            if (isset($requestProduct['Product']['description'])) {
+                $data["description"] = $requestProduct['Product']['description'];
+            }
+
+            if (isset($requestProduct['Product']['stock'])) {
+                $data["current_stock"] = $requestProduct['Product']['stock'];
+            }
+
+            $response = Http::put($url . 'api/product/' . $id, $data);
+
+            return $response;
 
         } catch (\Exception $e) {
             throw new \Exception($e->getCode());
@@ -260,9 +171,15 @@ class ProductsController extends Controller
      */
     public function destroy(string $id)
     {
-        $url = config('url');
-        $response = Http::delete($url . '/api/product/'.$id);
+        try {
+            $url = config('enjoy.url');
 
-        return $response->json();
+            $response = Http::delete($url.'api/product/'.$id);
+
+            return $response;
+
+        } catch (\Exception $e) {
+            throw new \Exception($e->getCode());
+        }
     }
 }
