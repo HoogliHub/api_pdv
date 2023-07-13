@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ClientsController;
 use App\Http\Controllers\OrdersController;
+use App\Http\Controllers\AuthController;
 
 Route::group(['prefix' => 'enjoy', 'as' => 'enjoy.' ], function () {
 //   PRODUTOS
@@ -25,4 +26,8 @@ Route::group(['prefix' => 'enjoy', 'as' => 'enjoy.' ], function () {
     ]]);
 
     Route::put('/clients/{id}', [OrdersController::class, 'edit']);
+
+    //AUTH
+
+    Route::post('/auth', [AuthController::class, 'auth']);
 });

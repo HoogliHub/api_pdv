@@ -21,7 +21,7 @@ class OrdersController extends Controller
 
             return $response;
         } catch (\Exception $e) {
-            throw new \Exception($e->getCode());
+            throw new \Exception($e->getMessage());
         }
     }
 
@@ -41,35 +41,19 @@ class OrdersController extends Controller
         try {
             $url = config('enjoy.url');
 
-            $requestClient = $request->all();
+            $requestOrder = $request->all();
 
 
-            if (isset($requestClient['Order']['point_sale'])) {
-
+            if (isset($requestOrder['Order']['Customer'])) {
+                $data['customer'] = $requestOrder['Order']['Customer'];
             }
 
-            if (isset($requestClient['Order']['shipment'])) {
-
+            if(isset($requestOrder['Order']['payment_form'])){
+                $data['payment_type'] = $requestOrder['Order']['payment_form'];
             }
 
-            if (isset($requestClient['Order']['shipment_value'])) {
-
-            }
-
-            if (isset($requestClient['Order']['payment_form'])) {
-                $data['city'] = $requestClient['Customer']['city'];
-            }
-
-            if (isset($requestClient['Order']['Customer'])) {
-
-            }
-
-            if (isset($requestClient['Order']['CustomerAddress'])) {
-
-            }
-
-            if (isset($requestClient['Order']['ProductsSold'])) {
-
+            if(isset($requestOrder['Order']['shipment_value'])){
+                $data['shipment_value'] = $requestOrder['Order']['shipment_value'];
             }
 
             $response = Http::post($url . 'api/order', $data);
@@ -77,7 +61,7 @@ class OrdersController extends Controller
             return $response;
 
         } catch (\Exception $e) {
-            throw new \Exception($e->getCode());
+            throw new \Exception($e->getMessage());
         }
     }
 
