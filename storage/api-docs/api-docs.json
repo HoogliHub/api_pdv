@@ -324,6 +324,323 @@
                     }
                 }
             }
+        },
+        "/api/enjoy/products/{id}": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get product details by ID",
+                "operationId": "313eca6c5a7177c981a39ab327d40226",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "Product": {
+                                                    "properties": {
+                                                        "modified": {
+                                                            "type": "string"
+                                                        },
+                                                        "slug": {
+                                                            "type": "string"
+                                                        },
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "description": {
+                                                            "type": "string"
+                                                        },
+                                                        "price": {
+                                                            "type": "string"
+                                                        },
+                                                        "cost_price": {
+                                                            "type": "string"
+                                                        },
+                                                        "dollar_cost_price": {
+                                                            "type": "string"
+                                                        },
+                                                        "promotional_price": {
+                                                            "type": "string"
+                                                        },
+                                                        "start_promotion": {
+                                                            "type": "string"
+                                                        },
+                                                        "end_promotion": {
+                                                            "type": "string"
+                                                        },
+                                                        "brand": {
+                                                            "type": "string",
+                                                            "example": ""
+                                                        },
+                                                        "brand_id": {
+                                                            "type": "integer",
+                                                            "example": ""
+                                                        },
+                                                        "model": {
+                                                            "type": "string",
+                                                            "example": ""
+                                                        },
+                                                        "weight": {
+                                                            "type": "number",
+                                                            "example": "518"
+                                                        },
+                                                        "length": {
+                                                            "type": "string",
+                                                            "example": "0"
+                                                        },
+                                                        "width": {
+                                                            "type": "string",
+                                                            "example": "0"
+                                                        },
+                                                        "height": {
+                                                            "type": "string",
+                                                            "example": "0"
+                                                        },
+                                                        "stock": {
+                                                            "type": "integer",
+                                                            "example": "15"
+                                                        },
+                                                        "category_id": {
+                                                            "type": "integer",
+                                                            "example": "26"
+                                                        },
+                                                        "category_name": {
+                                                            "type": "string",
+                                                            "example": "Teste"
+                                                        },
+                                                        "available": {
+                                                            "type": "string",
+                                                            "example": "1"
+                                                        },
+                                                        "availability": {
+                                                            "type": "string",
+                                                            "example": ""
+                                                        },
+                                                        "reference": {
+                                                            "type": "string",
+                                                            "example": "645123"
+                                                        },
+                                                        "hot": {
+                                                            "type": "string",
+                                                            "example": "0"
+                                                        },
+                                                        "release": {
+                                                            "type": "string",
+                                                            "example": "0"
+                                                        },
+                                                        "additional_button": {
+                                                            "type": "string",
+                                                            "example": "0"
+                                                        },
+                                                        "has_variation": {
+                                                            "type": "string",
+                                                            "example": "1"
+                                                        },
+                                                        "has_acceptance_terms": {
+                                                            "type": "string",
+                                                            "example": "1"
+                                                        },
+                                                        "has_buy_together": {
+                                                            "type": "string",
+                                                            "example": "1"
+                                                        },
+                                                        "additional_message": {
+                                                            "type": "string",
+                                                            "example": "Informação Adicional 3"
+                                                        },
+                                                        "warranty": {
+                                                            "type": "string",
+                                                            "example": ""
+                                                        },
+                                                        "rating": {
+                                                            "type": "string",
+                                                            "example": "0"
+                                                        },
+                                                        "count_rating": {
+                                                            "type": "integer",
+                                                            "example": "0"
+                                                        },
+                                                        "quantity_sold": {
+                                                            "type": "integer",
+                                                            "example": "0"
+                                                        },
+                                                        "ProductImage": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "http": {
+                                                                        "type": "string",
+                                                                        "example": "https://enjoy.com.br/public/uploads/all/WLGOL2M6YGA3qoa.webp"
+                                                                    },
+                                                                    "https": {
+                                                                        "type": "string",
+                                                                        "example": "https://enjoy.com.br/public/uploads/all/WLGOL2M6YGA3qoa.webp"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "image": {
+                                                            "type": "string"
+                                                        },
+                                                        "url": {
+                                                            "properties": {
+                                                                "http": {
+                                                                    "type": "string"
+                                                                },
+                                                                "https": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "created": {
+                                                            "type": "string",
+                                                            "example": "2016-10-19 09:30:12"
+                                                        },
+                                                        "Properties": {
+                                                            "properties": {
+                                                                "tamanho": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string",
+                                                                        "example": "G"
+                                                                    }
+                                                                },
+                                                                "cor": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string",
+                                                                        "example": "Preto"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "minimum_stock": {
+                                                            "type": "string",
+                                                            "example": "1"
+                                                        },
+                                                        "minimum_stock_alert": {
+                                                            "type": "string",
+                                                            "example": "1"
+                                                        },
+                                                        "percentage_discount": {
+                                                            "type": "string",
+                                                            "example": "10.0"
+                                                        },
+                                                        "all_categories": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "integer",
+                                                                "example": "2"
+                                                            }
+                                                        },
+                                                        "Variant": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "string",
+                                                                        "example": "162"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": "404"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The product ID provided is not valid."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameter",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": "400"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The :id parameter must be of integer type."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
