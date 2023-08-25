@@ -1,0 +1,329 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Nome da Sua API",
+        "description": "Descrição da sua API",
+        "contact": {
+            "email": "contato@example.com"
+        },
+        "license": {
+            "name": "Licença",
+            "url": "http://www.exemplo.com/licenca"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/enjoy/products": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "List products",
+                "operationId": "getProducts",
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort products by a specific field",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "id",
+                                "name",
+                                "unit_price",
+                                "current_stock",
+                                "created_at",
+                                "updated_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "Order products by a specific direction",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit the number of products per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "Offset for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": "200"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "sort": {
+                                                    "properties": {
+                                                        "field": {
+                                                            "type": "string",
+                                                            "example": "id"
+                                                        },
+                                                        "direction": {
+                                                            "type": "string",
+                                                            "example": "asc"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "Products": {
+                                                    "properties": {
+                                                        "modified": {
+                                                            "type": "string",
+                                                            "example": "2018-12-26 13:46:12"
+                                                        },
+                                                        "slug": {
+                                                            "type": "string",
+                                                            "example": "produto-teste"
+                                                        },
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": "0"
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "PRODUTO TESTE"
+                                                        },
+                                                        "price": {
+                                                            "type": "string",
+                                                            "example": "139.00"
+                                                        },
+                                                        "cost_price": {
+                                                            "type": "string",
+                                                            "example": "0.00"
+                                                        },
+                                                        "dollar_cost_price": {
+                                                            "type": "string",
+                                                            "example": "0.00"
+                                                        },
+                                                        "promotional_price": {
+                                                            "type": "string",
+                                                            "example": "0.00"
+                                                        },
+                                                        "start_promotion": {
+                                                            "type": "string",
+                                                            "example": "0000-00-00"
+                                                        },
+                                                        "end_promotion": {
+                                                            "type": "string",
+                                                            "example": "0000-00-00"
+                                                        },
+                                                        "brand": {
+                                                            "type": "string",
+                                                            "example": ""
+                                                        },
+                                                        "brand_id": {
+                                                            "type": "integer",
+                                                            "example": ""
+                                                        },
+                                                        "model": {
+                                                            "type": "string",
+                                                            "example": ""
+                                                        },
+                                                        "weight": {
+                                                            "type": "number",
+                                                            "example": "518"
+                                                        },
+                                                        "length": {
+                                                            "type": "string",
+                                                            "example": "0"
+                                                        },
+                                                        "width": {
+                                                            "type": "string",
+                                                            "example": "0"
+                                                        },
+                                                        "height": {
+                                                            "type": "string",
+                                                            "example": "0"
+                                                        },
+                                                        "stock": {
+                                                            "type": "integer",
+                                                            "example": "15"
+                                                        },
+                                                        "category_id": {
+                                                            "type": "integer",
+                                                            "example": "26"
+                                                        },
+                                                        "category_name": {
+                                                            "type": "string",
+                                                            "example": "Teste"
+                                                        },
+                                                        "available": {
+                                                            "type": "string",
+                                                            "example": "1"
+                                                        },
+                                                        "availability": {
+                                                            "type": "string",
+                                                            "example": ""
+                                                        },
+                                                        "reference": {
+                                                            "type": "string",
+                                                            "example": "645123"
+                                                        },
+                                                        "hot": {
+                                                            "type": "string",
+                                                            "example": "0"
+                                                        },
+                                                        "release": {
+                                                            "type": "string",
+                                                            "example": "0"
+                                                        },
+                                                        "additional_button": {
+                                                            "type": "string",
+                                                            "example": "0"
+                                                        },
+                                                        "has_variation": {
+                                                            "type": "string",
+                                                            "example": "1"
+                                                        },
+                                                        "rating": {
+                                                            "type": "string",
+                                                            "example": "0"
+                                                        },
+                                                        "count_rating": {
+                                                            "type": "integer",
+                                                            "example": "0"
+                                                        },
+                                                        "quantity_sold": {
+                                                            "type": "integer",
+                                                            "example": "0"
+                                                        },
+                                                        "url": {
+                                                            "properties": {
+                                                                "http": {
+                                                                    "type": "string",
+                                                                    "example": "http://enjoy.com.br/produto-teste"
+                                                                },
+                                                                "https": {
+                                                                    "type": "string",
+                                                                    "example": "https://enjoy.com.br/produto-teste"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "created": {
+                                                            "type": "string",
+                                                            "example": "2016-10-19 09:30:12"
+                                                        },
+                                                        "Properties": {
+                                                            "properties": {
+                                                                "tamanho": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string",
+                                                                        "example": "G"
+                                                                    }
+                                                                },
+                                                                "cor": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string",
+                                                                        "example": "Preto"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "ProductImage": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "http": {
+                                                                        "type": "string",
+                                                                        "example": "https://enjoy.com.br/public/uploads/all/WLGOL2M6YGA3qoa.webp"
+                                                                    },
+                                                                    "https": {
+                                                                        "type": "string",
+                                                                        "example": "https://enjoy.com.br/public/uploads/all/WLGOL2M6YGA3qoa.webp"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "Variant": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "string",
+                                                                        "example": "162"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "paging": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": "1"
+                                                        },
+                                                        "page": {
+                                                            "type": "integer",
+                                                            "example": "1"
+                                                        },
+                                                        "limit": {
+                                                            "type": "integer",
+                                                            "example": "1"
+                                                        },
+                                                        "lastPage": {
+                                                            "type": "integer",
+                                                            "example": "1"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        }
+    }
+}
