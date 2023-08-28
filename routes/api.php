@@ -17,8 +17,16 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
 Route::group(['prefix' => 'enjoy', 'as' => 'enjoy.'], function () {
-    Route::apiResource('products', 'App\Http\Controllers\Api\ProductController')->only(['index', 'show']);
+    Route::controller('App\Http\Controllers\Api\ProductController')->prefix('products')->name('products.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/show/{product}', 'show')->name('show');
+        Route::get('/sold/{product}', 'sold')->name('sold');
+    });
+    Route::controller('App\Http\Controllers\Api\OrderController')->prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', 'index')->name('index');
+    });
 });
 
 Route::fallback(function () {

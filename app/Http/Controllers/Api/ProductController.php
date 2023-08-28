@@ -9,6 +9,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class ProductController extends Controller
 {
@@ -277,12 +278,25 @@ class ProductController extends Controller
         ], 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    //TODO: Cadastrar Produto
     public function store(Request $request)
     {
-        //
+        $validated = Validator::make($request->all(), [
+            'name' => 'required|string',
+            'description' => 'string',
+            'price' => 'required|',
+            'start_promotion' => 'date',
+            'end_promotion' => 'date',
+            'brand' => 'string',
+            'weight' => '',
+            'stock' => '',
+            'category_id' => 'required',
+            'available' => '',
+            'virtual_product' => '',
+            'unit' => 'required'
+        ]);
+
+        dd($request);
     }
 
     /**
@@ -560,19 +574,177 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    //TODO: Atualizar Dados do Produto
     public function update(Request $request, string $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    //TODO: Exclusão de Produtos
     public function destroy(string $id)
     {
         //
+    }
+    
+    /**
+     * @OA\Get(
+     *     path="/enjoy/products/sold/{id}",
+     *     operationId="getSoldProducts",
+     *     tags={"Products"},
+     *     summary="Get sold products by ID",
+     *     description="Get sold products details by providing product ID.",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Product ID",
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="success",
+     *                 type="boolean"
+     *             ),
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="integer"
+     *             ),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="paging",
+     *                     type="object",
+     *                     @OA\Property(
+     *                         property="total",
+     *                         type="integer"
+     *                     ),
+     *                     @OA\Property(
+     *                         property="page",
+     *                         type="integer"
+     *                     )
+     *                 ),
+     *                 @OA\Property(
+     *                     property="sort",
+     *                     type="object",
+     *                     @OA\Property(
+     *                         property="id",
+     *                         type="string"
+     *                     )
+     *                 ),
+     *                 @OA\Property(
+     *                     property="ProductsSolds",
+     *                     type="object",
+     *                     @OA\Property(
+     *                         property="ProductsSold",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(
+     *                                 property="product_id",
+     *                                 type="integer"
+     *                             ),
+     *                             @OA\Property(
+     *                                 property="order_id",
+     *                                 type="integer"
+     *                             ),
+     *                             @OA\Property(
+     *                                 property="name",
+     *                                 type="string"
+     *                             ),
+     *                             @OA\Property(
+     *                                 property="price",
+     *                                 type="string"
+     *                             ),
+     *                             @OA\Property(
+     *                                 property="quantity",
+     *                                 type="integer"
+     *                             ),
+     *                             @OA\Property(
+     *                                 property="variation_id",
+     *                                 type="integer"
+     *                             ),
+     *                             @OA\Property(
+     *                                 property="reference",
+     *                                 type="string"
+     *                             )
+     *                         )
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="success",
+     *                 type="boolean"
+     *             ),
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="integer"
+     *             ),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="string"
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string"
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function sold(string $id): JsonResponse
+    {
+        if (!is_numeric(trim($id))) {
+            return \response()->json([
+                'success' => false,
+                'status' => ResponseAlias::HTTP_BAD_REQUEST,
+                'data' => [],
+                'message' => 'The :id parameter must be an integer.'
+            ], ResponseAlias::HTTP_BAD_REQUEST);
+        }
+
+        $productsSoldQuery = DB::connection('enjoy')->table('products as p')
+            ->select('p.id as product_id', 'o.id as order_id', 'p.name', 'od.price', 'od.quantity')
+            ->selectRaw('(select ps.id from product_stocks ps where ps.variant = od.variation and ps.product_id = p.id) as variation_id')
+            ->selectRaw('(select ps.sku from product_stocks ps where ps.variant = od.variation and ps.product_id = p.id) as reference')
+            ->leftJoin('order_details as od', 'od.product_id', '=', 'p.id')
+            ->leftJoin('orders as o', 'o.id', '=', 'od.order_id')
+            ->leftJoin('combined_orders as co', 'co.id', '=', 'o.combined_order_id')
+            ->where('p.id', '=', $id)
+            ->orderBy('p.id', 'ASC')
+            ->paginate(10);
+
+        $data = [
+            'paging' => [
+                'total' => $productsSoldQuery->total(),
+                'page' => $productsSoldQuery->currentPage(),
+            ],
+            'sort' => [
+                'id' => 'asc'
+            ],
+            'ProductsSolds' => [
+                'ProductsSold' => $productsSoldQuery->items()
+            ]
+        ];
+
+        return \response()->json([
+            'success' => true,
+            'status' => ResponseAlias::HTTP_OK,
+            'data' => $data
+        ], ResponseAlias::HTTP_OK);
     }
 }

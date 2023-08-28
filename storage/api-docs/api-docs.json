@@ -641,6 +641,132 @@
                     }
                 }
             }
+        },
+        "/enjoy/products/sold/{id}": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get sold products by ID",
+                "description": "Get sold products details by providing product ID.",
+                "operationId": "getSoldProducts",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "paging": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer"
+                                                        },
+                                                        "page": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "sort": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "ProductsSolds": {
+                                                    "properties": {
+                                                        "ProductsSold": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "product_id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "order_id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "price": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "quantity": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "variation_id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "reference": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
