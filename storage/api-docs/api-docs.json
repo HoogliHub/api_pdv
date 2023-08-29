@@ -13,12 +13,481 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/enjoy/orders": {
+            "get": {
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Get a list of orders",
+                "description": "Retrieve a list of orders with optional sorting, pagination, and filtering.",
+                "operationId": "getOrders",
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort orders by a specific field",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "id",
+                                "delivery_status",
+                                "payment_type",
+                                "payment_status",
+                                "grand_total",
+                                "date",
+                                "created_at",
+                                "updated_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "Sorting order (asc or desc)",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of items to retrieve per page",
+                        "schema": {
+                            "type": "integer",
+                            "example": "5"
+                        }
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "Number of items to skip",
+                        "schema": {
+                            "type": "integer",
+                            "example": "10"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with a list of orders",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "sort": {
+                                                    "properties": {
+                                                        "field": {
+                                                            "type": "string",
+                                                            "example": "delivery_status"
+                                                        },
+                                                        "direction": {
+                                                            "type": "string",
+                                                            "example": "desc"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "fieldsAvailableSortBy": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "delivery_status"
+                                                    }
+                                                },
+                                                "paging": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer"
+                                                        },
+                                                        "page": {
+                                                            "type": "integer"
+                                                        },
+                                                        "limit": {
+                                                            "type": "integer"
+                                                        },
+                                                        "lastPage": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "Orders": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "status_pagamento": {
+                                                                "type": "string",
+                                                                "example": "PENDENTE DE PAGAMENTO"
+                                                            },
+                                                            "status_entrega": {
+                                                                "type": "string",
+                                                                "example": "A ENVIAR"
+                                                            },
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": "1"
+                                                            },
+                                                            "date": {
+                                                                "type": "string",
+                                                                "example": "0000-00-00"
+                                                            },
+                                                            "customer_id": {
+                                                                "type": "integer",
+                                                                "example": "2"
+                                                            },
+                                                            "partial_total": {
+                                                                "type": "string",
+                                                                "example": "655.51"
+                                                            },
+                                                            "taxes": {
+                                                                "type": "string",
+                                                                "example": "0.00"
+                                                            },
+                                                            "discount": {
+                                                                "type": "string",
+                                                                "example": "0.00"
+                                                            },
+                                                            "point_sale": {
+                                                                "type": "string",
+                                                                "example": "545.51"
+                                                            },
+                                                            "shipment": {
+                                                                "type": "string",
+                                                                "example": "SEDEX"
+                                                            },
+                                                            "shipment_value": {
+                                                                "type": "string",
+                                                                "example": "12.54"
+                                                            },
+                                                            "value_1": {
+                                                                "type": "string",
+                                                                "example": "456.45"
+                                                            },
+                                                            "payment_type": {
+                                                                "type": "string",
+                                                                "example": "rede"
+                                                            },
+                                                            "payment_form": {
+                                                                "type": "string",
+                                                                "example": "Cartão de Crédito"
+                                                            },
+                                                            "total": {
+                                                                "type": "string",
+                                                                "example": "546.45"
+                                                            },
+                                                            "payment_date": {
+                                                                "type": "string",
+                                                                "example": "0000-00-00"
+                                                            },
+                                                            "modified": {
+                                                                "type": "string",
+                                                                "example": "0000-00-00 00:00:00"
+                                                            },
+                                                            "has_payment": {
+                                                                "type": "integer",
+                                                                "example": "1"
+                                                            },
+                                                            "has_shipment": {
+                                                                "type": "integer",
+                                                                "example": "0"
+                                                            },
+                                                            "ProductsSold": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": "3"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameter type",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/enjoy/orders/show/{id}": {
+            "get": {
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Retrieve order details by ID",
+                "operationId": "bc0127d466f913c0c889e08cce0a7e4c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the order to retrieve",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "Order": {
+                                                    "properties": {
+                                                        "status": {
+                                                            "type": "string"
+                                                        },
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "date": {
+                                                            "type": "string",
+                                                            "format": "date"
+                                                        },
+                                                        "customer_id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "partial_total": {
+                                                            "type": "string"
+                                                        },
+                                                        "taxes": {
+                                                            "type": "string"
+                                                        },
+                                                        "discount": {
+                                                            "type": "string"
+                                                        },
+                                                        "point_sale": {
+                                                            "type": "string"
+                                                        },
+                                                        "shipment": {
+                                                            "type": "string"
+                                                        },
+                                                        "shipment_value": {
+                                                            "type": "string"
+                                                        },
+                                                        "delivered": {
+                                                            "type": "integer"
+                                                        },
+                                                        "shipping_cancelled": {
+                                                            "type": "integer"
+                                                        },
+                                                        "discount_coupon": {
+                                                            "type": "string"
+                                                        },
+                                                        "installment": {
+                                                            "type": "string"
+                                                        },
+                                                        "value_1": {
+                                                            "type": "string"
+                                                        },
+                                                        "sending_code": {
+                                                            "type": "string"
+                                                        },
+                                                        "billing_address": {
+                                                            "type": "string"
+                                                        },
+                                                        "payment_method_id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "payment_method": {
+                                                            "type": "string"
+                                                        },
+                                                        "total": {
+                                                            "type": "string"
+                                                        },
+                                                        "payment_date": {
+                                                            "type": "string",
+                                                            "format": "date"
+                                                        },
+                                                        "shipment_integrator": {
+                                                            "type": "string"
+                                                        },
+                                                        "modified": {
+                                                            "type": "string",
+                                                            "format": "date-time"
+                                                        },
+                                                        "is_traceable": {
+                                                            "type": "integer"
+                                                        },
+                                                        "tracking_url": {
+                                                            "type": "string"
+                                                        },
+                                                        "has_payment": {
+                                                            "type": "integer"
+                                                        },
+                                                        "has_shipment": {
+                                                            "type": "integer"
+                                                        },
+                                                        "ProductsSold": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "Payment": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Order not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameter type",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/enjoy/products": {
             "get": {
                 "tags": [
                     "Products"
                 ],
-                "summary": "List products",
+                "summary": "Get a list of products",
+                "description": "Retrieve a list of products with optional sorting, pagination, and filtering.",
                 "operationId": "getProducts",
                 "parameters": [
                     {
@@ -325,13 +794,13 @@
                 }
             }
         },
-        "/api/enjoy/products/{id}": {
+        "/api/enjoy/products/show/{id}": {
             "get": {
                 "tags": [
                     "Products"
                 ],
                 "summary": "Get product details by ID",
-                "operationId": "313eca6c5a7177c981a39ab327d40226",
+                "operationId": "627cc54685dff64b6c323ac6f3b17f11",
                 "parameters": [
                     {
                         "name": "id",
@@ -604,7 +1073,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "The product ID provided is not valid."
+                                            "example": "There is no data for the given ID."
                                         }
                                     },
                                     "type": "object"

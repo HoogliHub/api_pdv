@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
+use function response;
 
 class ProductController extends Controller
 {
@@ -18,7 +18,8 @@ class ProductController extends Controller
      *     path="/api/enjoy/products",
      *     operationId="getProducts",
      *     tags={"Products"},
-     *     summary="List products",
+     *     summary="Get a list of products",
+     *     description="Retrieve a list of products with optional sorting, pagination, and filtering.",
      *     @OA\Parameter(
      *         name="sort",
      *         in="query",
@@ -271,7 +272,7 @@ class ProductController extends Controller
             $data['Products'][] = $productData;
         });
 
-        return \response()->json([
+        return response()->json([
             'success' => true,
             'status' => 200,
             'data' => $data
@@ -301,7 +302,7 @@ class ProductController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/enjoy/products/{id}",
+     *     path="/api/enjoy/products/show/{id}",
      *     summary="Get product details by ID",
      *     tags={"Products"},
      *     @OA\Parameter(
@@ -398,7 +399,7 @@ class ProductController extends Controller
      *             @OA\Property(property="success", type="boolean",example="false"),
      *             @OA\Property(property="status", type="integer",example="404"),
      *             @OA\Property(property="data", type="object"),
-     *             @OA\Property(property="message", type="string",example="The product ID provided is not valid.")
+     *             @OA\Property(property="message", type="string",example="There is no data for the given ID.")
      *         )
      *     ),
      *     @OA\Response(
@@ -551,21 +552,21 @@ class ProductController extends Controller
                     'Variant' => $variationIdData
                 ];
 
-                return \response()->json([
+                return response()->json([
                     'success' => true,
                     'status' => 200,
                     'data' => $data
                 ], 200);
             } else {
-                return \response()->json([
+                return response()->json([
                     'success' => true,
                     'status' => 404,
                     'data' => [],
-                    'message' => 'The product ID provided is not valid.'
+                    'message' => 'There is no data for the given ID.'
                 ], 404);
             }
         } else {
-            return \response()->json([
+            return response()->json([
                 'success' => false,
                 'status' => 400,
                 'data' => [],
@@ -585,7 +586,7 @@ class ProductController extends Controller
     {
         //
     }
-    
+
     /**
      * @OA\Get(
      *     path="/enjoy/products/sold/{id}",
@@ -709,7 +710,7 @@ class ProductController extends Controller
     public function sold(string $id): JsonResponse
     {
         if (!is_numeric(trim($id))) {
-            return \response()->json([
+            return response()->json([
                 'success' => false,
                 'status' => ResponseAlias::HTTP_BAD_REQUEST,
                 'data' => [],
@@ -741,7 +742,7 @@ class ProductController extends Controller
             ]
         ];
 
-        return \response()->json([
+        return response()->json([
             'success' => true,
             'status' => ResponseAlias::HTTP_OK,
             'data' => $data
