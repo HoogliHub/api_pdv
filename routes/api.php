@@ -27,6 +27,7 @@ Route::group(['prefix' => 'enjoy', 'as' => 'enjoy.'], function () {
     Route::controller('App\Http\Controllers\Api\OrderController')->prefix('orders')->name('orders.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/show/{order}', 'show')->name('show');
+        Route::get('/show/{order}/complete', 'show_details')->name('show.details');
     });
 });
 
