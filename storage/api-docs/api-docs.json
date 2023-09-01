@@ -684,92 +684,100 @@
                                                                     "type": "object"
                                                                 },
                                                                 "ProductsSold": {
-                                                                    "properties": {
-                                                                        "product_id": {
-                                                                            "type": "integer"
-                                                                        },
-                                                                        "quantity": {
-                                                                            "type": "integer"
-                                                                        },
-                                                                        "order_id": {
-                                                                            "type": "integer"
-                                                                        },
-                                                                        "name": {
-                                                                            "type": "string"
-                                                                        },
-                                                                        "virtual_product": {
-                                                                            "type": "integer"
-                                                                        },
-                                                                        "Sku": {
-                                                                            "type": "array",
-                                                                            "items": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "properties": {
+                                                                            "ProductSold": {
                                                                                 "properties": {
-                                                                                    "type": {
+                                                                                    "product_id": {
+                                                                                        "type": "integer"
+                                                                                    },
+                                                                                    "quantity": {
+                                                                                        "type": "integer"
+                                                                                    },
+                                                                                    "order_id": {
+                                                                                        "type": "integer"
+                                                                                    },
+                                                                                    "name": {
                                                                                         "type": "string"
                                                                                     },
-                                                                                    "value": {
+                                                                                    "virtual_product": {
+                                                                                        "type": "integer"
+                                                                                    },
+                                                                                    "Sku": {
+                                                                                        "type": "array",
+                                                                                        "items": {
+                                                                                            "properties": {
+                                                                                                "type": {
+                                                                                                    "type": "string"
+                                                                                                },
+                                                                                                "value": {
+                                                                                                    "type": "string"
+                                                                                                }
+                                                                                            },
+                                                                                            "type": "object"
+                                                                                        }
+                                                                                    },
+                                                                                    "price": {
                                                                                         "type": "string"
+                                                                                    },
+                                                                                    "reference": {
+                                                                                        "type": "string"
+                                                                                    },
+                                                                                    "weight": {
+                                                                                        "type": "string"
+                                                                                    },
+                                                                                    "variant_id": {
+                                                                                        "type": "integer"
+                                                                                    },
+                                                                                    "ProductSoldImage": {
+                                                                                        "type": "array",
+                                                                                        "items": {
+                                                                                            "properties": {
+                                                                                                "http": {
+                                                                                                    "type": "string"
+                                                                                                },
+                                                                                                "https": {
+                                                                                                    "type": "string"
+                                                                                                }
+                                                                                            },
+                                                                                            "type": "object"
+                                                                                        }
+                                                                                    },
+                                                                                    "Category": {
+                                                                                        "properties": {
+                                                                                            "id": {
+                                                                                                "type": "integer"
+                                                                                            },
+                                                                                            "name": {
+                                                                                                "type": "string"
+                                                                                            },
+                                                                                            "main_category_id": {
+                                                                                                "type": "integer"
+                                                                                            },
+                                                                                            "main_category_name": {
+                                                                                                "type": "string"
+                                                                                            }
+                                                                                        },
+                                                                                        "type": "object"
+                                                                                    },
+                                                                                    "url": {
+                                                                                        "properties": {
+                                                                                            "http": {
+                                                                                                "type": "string"
+                                                                                            },
+                                                                                            "https": {
+                                                                                                "type": "string"
+                                                                                            }
+                                                                                        },
+                                                                                        "type": "object"
                                                                                     }
                                                                                 },
                                                                                 "type": "object"
                                                                             }
                                                                         },
-                                                                        "price": {
-                                                                            "type": "string"
-                                                                        },
-                                                                        "reference": {
-                                                                            "type": "string"
-                                                                        },
-                                                                        "weight": {
-                                                                            "type": "string"
-                                                                        },
-                                                                        "variant_id": {
-                                                                            "type": "integer"
-                                                                        },
-                                                                        "ProductSoldImage": {
-                                                                            "type": "array",
-                                                                            "items": {
-                                                                                "properties": {
-                                                                                    "http": {
-                                                                                        "type": "string"
-                                                                                    },
-                                                                                    "https": {
-                                                                                        "type": "string"
-                                                                                    }
-                                                                                },
-                                                                                "type": "object"
-                                                                            }
-                                                                        },
-                                                                        "Category": {
-                                                                            "properties": {
-                                                                                "id": {
-                                                                                    "type": "integer"
-                                                                                },
-                                                                                "name": {
-                                                                                    "type": "string"
-                                                                                },
-                                                                                "main_category_id": {
-                                                                                    "type": "integer"
-                                                                                },
-                                                                                "main_category_name": {
-                                                                                    "type": "string"
-                                                                                }
-                                                                            },
-                                                                            "type": "object"
-                                                                        },
-                                                                        "url": {
-                                                                            "properties": {
-                                                                                "http": {
-                                                                                    "type": "string"
-                                                                                },
-                                                                                "https": {
-                                                                                    "type": "string"
-                                                                                }
-                                                                            },
-                                                                            "type": "object"
-                                                                        }
-                                                                    },
-                                                                    "type": "object"
+                                                                        "type": "object"
+                                                                    }
                                                                 }
                                                             },
                                                             "type": "object"

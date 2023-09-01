@@ -444,38 +444,42 @@ class OrderController extends Controller
      *                             @OA\Property(property="longitude", type="string"),
      *                             @OA\Property(property="default_address", type="string"),
      *                         ),
-     *                         @OA\Property(property="ProductsSold", type="object",
-     *                             @OA\Property(property="product_id", type="integer"),
-     *                             @OA\Property(property="quantity", type="integer"),
-     *                             @OA\Property(property="order_id", type="integer"),
-     *                             @OA\Property(property="name", type="string"),
-     *                             @OA\Property(property="virtual_product", type="integer"),
-     *                             @OA\Property(property="Sku", type="array",
-     *                                 @OA\Items(type="object",
-     *                                     @OA\Property(property="type", type="string"),
-     *                                     @OA\Property(property="value", type="string")
-     *                                 )
-     *                             ),
-     *                             @OA\Property(property="price", type="string"),
-     *                             @OA\Property(property="reference", type="string"),
-     *                             @OA\Property(property="weight", type="string"),
-     *                             @OA\Property(property="variant_id", type="integer"),
-     *                             @OA\Property(property="ProductSoldImage", type="array",
-     *                                 @OA\Items(type="object",
-     *                                     @OA\Property(property="http", type="string"),
-     *                                     @OA\Property(property="https", type="string")
-     *                                 )
-     *                             ),
-     *                             @OA\Property(property="Category", type="object",
-     *                                 @OA\Property(property="id", type="integer"),
-     *                                 @OA\Property(property="name", type="string"),
-     *                                 @OA\Property(property="main_category_id", type="integer"),
-     *                                 @OA\Property(property="main_category_name", type="string")
-     *                             ),
-     *                             @OA\Property(property="url", type="object",
-     *                                 @OA\Property(property="http", type="string"),
-     *                                 @OA\Property(property="https", type="string")
-     *                             )
+     *                         @OA\Property(property="ProductsSold", type="array",
+     *	                              @OA\Items(type="object",
+     *                                      @OA\Property(property="ProductSold", type="object",
+     *	                         			     @OA\Property(property="product_id", type="integer"),
+     *	                         			     @OA\Property(property="quantity", type="integer"),
+     *	                         			     @OA\Property(property="order_id", type="integer"),
+     *	                         			     @OA\Property(property="name", type="string"),
+     *	                         			     @OA\Property(property="virtual_product", type="integer"),
+     *	                         			     @OA\Property(property="Sku", type="array",
+     *	                         			         @OA\Items(type="object",
+     *	                         			             @OA\Property(property="type", type="string"),
+     *	                         			             @OA\Property(property="value", type="string")
+     *                           			           )
+     *                           			       ),
+     *	                         			     @OA\Property(property="price", type="string"),
+     *	                         			     @OA\Property(property="reference", type="string"),
+     *	                         			     @OA\Property(property="weight", type="string"),
+     *	                         			     @OA\Property(property="variant_id", type="integer"),
+     *	                         			     @OA\Property(property="ProductSoldImage", type="array",
+     *	                         			         @OA\Items(type="object",
+     *	                         			             @OA\Property(property="http", type="string"),
+     *	                         			             @OA\Property(property="https", type="string")
+     *                           			           )
+     *                           			       ),
+     *	                         			     @OA\Property(property="Category", type="object",
+     *	                         			         @OA\Property(property="id", type="integer"),
+     *	                         			         @OA\Property(property="name", type="string"),
+     *	                         			         @OA\Property(property="main_category_id", type="integer"),
+     *	                         			         @OA\Property(property="main_category_name", type="string")
+     *                           			       ),
+     *	                         			     @OA\Property(property="url", type="object",
+     *	                         			         @OA\Property(property="http", type="string"),
+     *	                         			         @OA\Property(property="https", type="string")
+     *                           			       )
+     *                           			)
+     *                                )
      *                         )
      *                     )
      *                 )
@@ -512,18 +516,11 @@ class OrderController extends Controller
 
             $order = DB::connection('enjoy')->table('orders as o')
                 ->select('o.*')
-                ->addSelect('od.tax', 'od.price', 'od.product_id', 'od.shipping_cost', 'od.quantity as product_quantity', 'od.variation')
+                ->addSelect('od.tax', 'od.price', 'od.product_id', 'od.shipping_cost', 'od.variation')
                 ->addSelect('u.name as user_name', 'u.email as user_email', 'u.phone as user_phone', 'u.cpf as user_cpf', 'u.created_at as user_created_at', 'u.updated_at as user_modified', 'u.user_type')
                 ->addSelect('a.id as address_id', 'a.address', 'a.postal_code as zip_code', 'c.name as country_name', 'c2.name as city_name', 's.name as state_name', 'a.set_default', 'a.latitude', 'a.longitude')
-                ->addSelect('p.name as product_name', 'p.digital', 'p.unit_price', 'p.weight', 'p.photos as product_photos', 'p.slug as product_slug')
-                ->addSelect('ps.sku', 'ps.id as variant_id')
-                ->addSelect('c3.id as category_id', 'c3.name as category_name', 'c3.parent_id')
-                ->selectRaw('(select name from categories where id = c3.parent_id) as main_category')
                 ->leftJoin('order_details as od', 'od.order_id', '=', 'o.id')
                 ->leftJoin('combined_orders as co', 'co.id', '=', 'o.combined_order_id')
-                ->leftJoin('products as p', 'p.id', '=', 'od.product_id')
-                ->leftJoin('product_stocks as ps', 'ps.product_id', '=', 'p.id')
-                ->leftJoin('categories as c3', 'p.category_id', '=', 'c3.id')
                 ->leftJoin('users as u', 'u.id', '=', 'o.user_id')
                 ->leftJoin('addresses as a', 'o.user_id', '=', 'a.user_id')
                 ->leftJoin('countries as c', 'a.country_id', '=', 'c.id')
@@ -531,7 +528,72 @@ class OrderController extends Controller
                 ->leftJoin('states as s', 'a.state_id', '=', 's.id')
                 ->where('o.id', '=', $id)
                 ->first();
+
             if ($order) {
+                $order_products = DB::connection('enjoy')->table('order_details as od')
+                    ->select('p.id as product_id', 'p.name as product_name', 'p.digital', 'p.unit_price', 'p.weight',
+                        'p.photos as product_photos', 'p.slug as product_slug', 'c.id as category_id',
+                        'c.name as category_name', 'c.parent_id', 'od.quantity as product_quantity', 'od.order_id', 'od.variation')
+                    ->selectRaw('(select name from categories where id = c.parent_id) as main_category')
+                    ->selectRaw('(select sku from product_stocks ps where ps.product_id = od.product_id and ps.variant = od.variation) as sku')
+                    ->selectRaw('(select id from product_stocks ps where ps.product_id = od.product_id and ps.variant = od.variation) as variant_id')
+                    ->leftJoin('products as p', 'p.id', '=', 'od.product_id')
+                    ->leftJoin('categories as c', 'p.category_id', '=', 'c.id')
+                    ->where('od.order_id', '=', $order->id)
+                    ->get();
+                $products = [];
+                foreach ($order_products as $order_product) {
+
+                    $photoIds = explode(',', $order_product->product_photos);
+                    $photos = DB::connection('enjoy')->table('uploads')->whereIn('id', $photoIds)->get();
+                    $photo_names = $photos->pluck('file_name')->toArray();
+
+                    $photos_data = [];
+
+                    foreach ($photo_names as $photo) {
+                        $photosInfo = [
+                            'http' => $baseHttpUrl . 'public/' . $photo,
+                            'https' => $baseHttpsUrl . 'public/' . $photo
+                        ];
+                        $photos_data[] = $photosInfo;
+                    }
+
+                    $products[] = [
+                        'ProductSold' => [
+                            'product_id' => $order_product->product_id,
+                            'quantity' => $order_product->product_quantity,
+                            'order_id' => $order_product->order_id,
+                            'name' => $order_product->product_name,
+                            'virtual_product' => $order_product->digital,
+                            'Sku' => [
+                                [
+                                    'type' => 'Cor',
+                                    'value' => explode('-', $order_product->variation)[0]
+                                ], [
+                                    'type' => 'Tamanho',
+                                    'value' => explode('-', $order_product->variation)[1]
+                                ]
+                            ],
+                            'price' => number_format($order_product->unit_price, 2),
+                            'reference' => is_numeric($order_product->sku) ? $order_product->sku : null,
+                            'weight' => $order_product->weight,
+                            'variant_id' => $order_product->variant_id,
+                            'ProductSoldImage' => $photos_data,
+                            'Category' => [
+                                'id' => $order_product->category_id,
+                                'name' => $order_product->category_name,
+                                'main_category_id' => $order_product->parent_id != 0 ? $order_product->parent_id : null,
+                                'main_category_name' => $order_product->parent_id != 0 ? $order_product->main_category : null
+                            ],
+                            'url' => [
+                                'http' => $baseHttpUrl . 'produto/' . $order_product->product_slug,
+                                'https' => $baseHttpsUrl . 'produto/' . $order_product->product_slug,
+                            ]
+                        ]
+                    ];
+
+                }
+
                 $shipping_address = json_decode($order->shipping_address);
 
                 $propertiesToRemove = ["name", "email", "correios", "valor_correios"];
@@ -542,20 +604,6 @@ class OrderController extends Controller
                 $settings = DB::connection('enjoy')->table('business_settings as bs')
                     ->where('type', '=', $order->payment_type)
                     ->first();
-
-                $photoIds = explode(',', $order->product_photos);
-                $photos = DB::connection('enjoy')->table('uploads')->whereIn('id', $photoIds)->get();
-                $photo_names = $photos->pluck('file_name')->toArray();
-
-                $photosData = [];
-
-                foreach ($photo_names as $photo) {
-                    $photosInfo = [
-                        'http' => $baseHttpUrl . 'public/' . $photo,
-                        'https' => $baseHttpsUrl . 'public/' . $photo
-                    ];
-                    $photosData[] = $photosInfo;
-                }
 
                 $data['Order'] = [
                     'status' => get_payment_status($order->payment_status),
@@ -613,37 +661,7 @@ class OrderController extends Controller
                             'longitude' => $order->longitude,
                             'default_address' => $order->set_default
                         ],
-                        'ProductsSold' => [
-                            'product_id' => $order->product_id,
-                            'quantity' => $order->product_quantity,
-                            'order_id' => $order->id,
-                            'name' => $order->product_name,
-                            'virtual_product' => $order->digital,
-                            'Sku' => [
-                                [
-                                    'type' => 'Cor',
-                                    'value' => explode('-', $order->variation)[0]
-                                ], [
-                                    'type' => 'Tamanho',
-                                    'value' => explode('-', $order->variation)[1]
-                                ]
-                            ],
-                            'price' => number_format($order->unit_price, 2),
-                            'reference' => is_numeric($order->sku) ? $order->sku : null,
-                            'weight' => $order->weight,
-                            'variant_id' => $order->variant_id,
-                            'ProductSoldImage' => $photosData,
-                            'Category' => [
-                                'id' => $order->category_id,
-                                'name' => $order->category_name,
-                                'main_category_id' => $order->parent_id != 0 ? $order->parent_id : null,
-                                'main_category_name' => $order->parent_id != 0 ? $order->main_category : null
-                            ],
-                            'url' => [
-                                'http' => $baseHttpUrl . 'produto/' . $order->product_slug,
-                                'https' => $baseHttpsUrl . 'produto/' . $order->product_slug,
-                            ]
-                        ]
+                        'ProductsSold' => $products
                     ]
                 ];
                 return response()->json([
