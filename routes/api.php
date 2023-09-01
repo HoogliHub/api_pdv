@@ -19,6 +19,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::group(['prefix' => 'enjoy', 'as' => 'enjoy.'], function () {
+    Route::controller('App\Http\Controllers\Api\AuthController')->group(function () {
+        Route::post('/auth/register', 'create_user')->name('register');
+        Route::post('/auth/login', 'login_user')->name('login');
+    });
     Route::controller('App\Http\Controllers\Api\ProductController')->prefix('products')->name('products.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/show/{product}', 'show')->name('show');
