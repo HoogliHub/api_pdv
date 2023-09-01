@@ -12,10 +12,10 @@
         "laravel/sanctum": "^3.2",
         "laravel/tinker": "^2.8",
         "predis/predis": "*",
-        "zircote/swagger-php": "^4.7",
-        "ext-http": "*"
+        "zircote/swagger-php": "^4.7"
     },
     "require-dev": {
+        "barryvdh/laravel-ide-helper": "^2.13",
         "fakerphp/faker": "^1.23",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.18",

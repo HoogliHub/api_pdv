@@ -199,9 +199,7 @@ class OrderController extends Controller
         ], 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    //TODO
     public function store(Request $request)
     {
         //
@@ -456,8 +454,8 @@ class OrderController extends Controller
      *	                         			         @OA\Items(type="object",
      *	                         			             @OA\Property(property="type", type="string"),
      *	                         			             @OA\Property(property="value", type="string")
-     *                           			           )
-     *                           			       ),
+     *                                               )
+     *                                           ),
      *	                         			     @OA\Property(property="price", type="string"),
      *	                         			     @OA\Property(property="reference", type="string"),
      *	                         			     @OA\Property(property="weight", type="string"),
@@ -466,19 +464,19 @@ class OrderController extends Controller
      *	                         			         @OA\Items(type="object",
      *	                         			             @OA\Property(property="http", type="string"),
      *	                         			             @OA\Property(property="https", type="string")
-     *                           			           )
-     *                           			       ),
+     *                                               )
+     *                                           ),
      *	                         			     @OA\Property(property="Category", type="object",
      *	                         			         @OA\Property(property="id", type="integer"),
      *	                         			         @OA\Property(property="name", type="string"),
      *	                         			         @OA\Property(property="main_category_id", type="integer"),
      *	                         			         @OA\Property(property="main_category_name", type="string")
-     *                           			       ),
+     *                                           ),
      *	                         			     @OA\Property(property="url", type="object",
      *	                         			         @OA\Property(property="http", type="string"),
      *	                         			         @OA\Property(property="https", type="string")
-     *                           			       )
-     *                           			)
+     *                                           )
+     *                                    )
      *                                )
      *                         )
      *                     )
@@ -687,17 +685,13 @@ class OrderController extends Controller
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    //TODO
     public function update(Request $request, string $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    //TODO
     public function destroy(string $id)
     {
         //
