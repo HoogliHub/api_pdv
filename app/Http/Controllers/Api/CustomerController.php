@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use OpenApi\Annotations as OA;
+use Throwable;
 
 class CustomerController extends Controller
 {
@@ -187,11 +190,164 @@ class CustomerController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/api/enjoy/customers/create",
+     *     summary="Create a new user",
+     *     description="Creates a new user and associates addresses with it.",
+     *     tags={"Customers"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="User data and addresses",
+     *         @OA\JsonContent(
+     *             required={"name", "email", "cpf", "phone", "CustomerAddress"},
+     *             @OA\Property(property="name", type="string", description="User name"),
+     *             @OA\Property(property="email", type="string", format="email", description="User email"),
+     *             @OA\Property(property="password", type="string", description="User password"),
+     *             @OA\Property(property="cpf", type="string", description="User password. If not provided, it will be generated from the first six digits of the CPF."),
+     *             @OA\Property(property="phone", type="string", description="User phone"),
+     *             @OA\Property(
+     *                 property="CustomerAddress",
+     *                 type="array",
+     *                 description="Customer address list",
+     *                 @OA\Items(
+     *                     @OA\Property(property="address", type="string", description="Address"),
+     *                     @OA\Property(property="country", type="string", description="Address country"),
+     *                     @OA\Property(property="state", type="string", description="Address state"),
+     *                     @OA\Property(property="city", type="string", description="Address city"),
+     *                     @OA\Property(property="zip_code", type="string", description="Address zip code"),
+     *                     @OA\Property(property="default_address", type="boolean", description="Indicates whether it is the default address (true) or not (false).")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Usuário criado com sucesso",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="message", type="string", example="User Created Successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Erro de validação",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="status", type="integer", example=400),
+     *             @OA\Property(property="message", type="string", example="Required fields are missing or incorrect."),
+     *             @OA\Property(property="errors", type="object", example={"name": {"The name field is required."}})
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=409,
+     *         description="Data conflict",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="status", type="integer", example=409),
+     *             @OA\Property(property="message", type="string", example="There is already a record with the given email.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erro interno do servidor",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="status", type="integer", example=500),
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string',
+            'email' => 'required|email',
+            'password' => 'string',
+            'cpf' => 'required|string',
+            'phone' => 'required|string',
+            'CustomerAddress' => 'required|array',
+            'CustomerAddress.*.address' => 'required|string',
+            'CustomerAddress.*.country' => 'required|string',
+            'CustomerAddress.*.state' => 'required|string',
+            'CustomerAddress.*.city' => 'required|string',
+            'CustomerAddress.*.zip_code' => 'required|string',
+            'CustomerAddress.*.default_address' => 'required|boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'status' => 400,
+                'message' => 'Required fields are missing or incorrect.',
+                'erros' => $validator->errors()
+            ], 400);
+        }
+
+        $email_already_exists = DB::connection('enjoy')->table('users')->where('email', 'LIKE', '%' . $request->input('email') . '%')->first();
+        $cpf_already_exists = DB::connection('enjoy')->table('users')->where('cpf', 'LIKE', '%' . $request->input('cpf') . '%')->orWhere('cpf', 'LIKE', '%' . str_replace(['.', '-', '_', ' '], '', $request->input('cpf')) . '%')->first();
+
+        if ($email_already_exists !== null) {
+            return response()->json([
+                'success' => false,
+                'status' => 409,
+                'message' => 'There is already a record with the given email.',
+            ], 409);
+        }
+
+        if ($cpf_already_exists !== null) {
+            return response()->json([
+                'success' => false,
+                'status' => 409,
+                'message' => 'There is already a record with the given cpf.',
+            ], 409);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $userId = DB::connection('enjoy')->table('users')->insertGetId([
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'password' => $request->input('password') ? Hash::make(substr(str_replace(['-', '.', '_', ' '], '', $request->input('cpf')), 0, 6)) : Hash::make($request->input('password')),
+                'cpf' => str_replace(['-', '.', '_', ' '], '', $request->input('cpf')),
+                'phone' => $request->input('phone'),
+                'created_at' => now(),
+                'updated_at' => now(),
+                'user_type' => 'customer'
+            ]);
+
+            foreach ($request->input('CustomerAddress') as $address) {
+                $country = DB::connection('enjoy')->table('countries')->select('id')->where('name', 'LIKE', '%' . ($address['country'] == 'Brasil' ? 'Brazil' : $address['country']) . '%')->first();
+                $state = DB::connection('enjoy')->table('states')->select('id')->where('name', 'LIKE', '%' . $address['state'] . '%')->where('country_id', '=', $country->id)->first();
+                $city = DB::connection('enjoy')->table('cities')->select('id')->where('name', 'LIKE', '%' . $address['city'] . '%')->where('state_id', '=', $state->id)->first();
+
+                DB::connection('enjoy')->table('addresses')->insert([
+                    'user_id' => $userId,
+                    'address' => $address['address'],
+                    'country_id' => $country->id,
+                    'state_id' => $state->id,
+                    'city_id' => $city->id,
+                    'postal_code' => str_replace(['-', '_', '.', ' '], '', $address['zip_code']),
+                    'set_default' => !$address['default_address'] ? 0 : 1,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+            DB::commit();
+            return response()->json([
+                'status' => true,
+                'message' => 'User Created Successfully'
+            ], 200);
+        } catch (Throwable $th) {
+            DB::rollback();
+            return response()->json([
+                'success' => false,
+                'status' => 500,
+                'message' => 'Internal server error',
+            ], 500);
+        }
     }
 
     /**
@@ -291,7 +447,7 @@ class CustomerController extends Controller
                     'phone' => $customer->phone,
                     'email' => $customer->email,
                     'total_orders' => $customer->total_orders,
-                    'last_purchase' => $customer->last_purchase ? date('Y-m-d',$customer->last_purchase) : null,
+                    'last_purchase' => $customer->last_purchase ? date('Y-m-d', $customer->last_purchase) : null,
                     'address' => $customer->address,
                     'zip_code' => $customer->zip_code,
                     'country' => $customer->country_name,

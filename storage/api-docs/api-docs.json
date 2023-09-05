@@ -251,6 +251,196 @@
                 }
             }
         },
+        "/api/enjoy/customers/create": {
+            "post": {
+                "tags": [
+                    "Customers"
+                ],
+                "summary": "Create a new user",
+                "description": "Creates a new user and associates addresses with it.",
+                "operationId": "3b741e88161cfcf8b5bd48beb6352f93",
+                "requestBody": {
+                    "description": "User data and addresses",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "cpf",
+                                    "phone",
+                                    "CustomerAddress"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "description": "User name",
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "description": "User email",
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "description": "User password",
+                                        "type": "string"
+                                    },
+                                    "cpf": {
+                                        "description": "User password. If not provided, it will be generated from the first six digits of the CPF.",
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "description": "User phone",
+                                        "type": "string"
+                                    },
+                                    "CustomerAddress": {
+                                        "description": "Customer address list",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "address": {
+                                                    "description": "Address",
+                                                    "type": "string"
+                                                },
+                                                "country": {
+                                                    "description": "Address country",
+                                                    "type": "string"
+                                                },
+                                                "state": {
+                                                    "description": "Address state",
+                                                    "type": "string"
+                                                },
+                                                "city": {
+                                                    "description": "Address city",
+                                                    "type": "string"
+                                                },
+                                                "zip_code": {
+                                                    "description": "Address zip code",
+                                                    "type": "string"
+                                                },
+                                                "default_address": {
+                                                    "description": "Indicates whether it is the default address (true) or not (false).",
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Usuário criado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User Created Successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Required fields are missing or incorrect."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "name": [
+                                                    "O campo nome é obrigatório."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflito de dados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 409
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "There is already a record with the given email."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal server error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/enjoy/customers/show/{id}": {
             "get": {
                 "tags": [
