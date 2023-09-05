@@ -35,6 +35,7 @@ Route::group(['prefix' => 'enjoy', 'as' => 'enjoy.'], function () {
     });
     Route::controller('App\Http\Controllers\Api\CustomerController')->prefix('customers')->name('customers.')->group(function () {
         Route::get('/', 'index')->name('index');
+        Route::get('/show/{customer}', 'show')->name('show');
     });
 });
 
