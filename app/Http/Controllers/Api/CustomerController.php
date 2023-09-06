@@ -337,6 +337,8 @@ class CustomerController extends Controller
             }
             DB::commit();
             return response()->json([
+                'success' => true,
+                'code' => 201,
                 'status' => true,
                 'message' => 'User Created Successfully'
             ], 200);
@@ -492,10 +494,96 @@ class CustomerController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/api/enjoy/customers/delete/{id}",
+     *     tags={"Customers"},
+     *     summary="Delete a customer and associated addresses by ID.",
+     *     operationId="deleteCustomer",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the customer to delete.",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=204,
+     *         description="No Content",
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(property="success", type="boolean", example=true),
+     *                 @OA\Property(property="status", type="integer", example=204),
+     *                 @OA\Property(property="message", type="string", example="User deleted successfully")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Not Found",
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(property="success", type="boolean", example=true),
+     *                 @OA\Property(property="status", type="integer", example=404),
+     *                 @OA\Property(property="data", type="object"),
+     *                 @OA\Property(property="message", type="string", example="There is no data for the given ID.")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(property="success", type="boolean", example=false),
+     *                 @OA\Property(property="status", type="integer", example=400),
+     *                 @OA\Property(property="data", type="object"),
+     *                 @OA\Property(property="message", type="string", example="The :id parameter must be of integer type.")
+     *             )
+     *         )
+     *     )
+     * )
      */
     public function destroy(string $id)
     {
-        //
+        if (is_numeric(trim($id))) {
+
+            $customer = DB::connection('enjoy')->table('users as u')
+                ->where('u.user_type', '=', 'customer')
+                ->where('u.id', '=', $id)
+                ->first();
+            if ($customer) {
+                DB::connection('enjoy')->table('addresses as a')
+                    ->where('a.user_id', '=', $customer->id)
+                    ->delete();
+
+                DB::connection('enjoy')->table('users')->delete($customer->id);
+
+                return response()->json([
+                    'success' => true,
+                    'status' => 204,
+                    'message' => 'User deleted successfully'
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => true,
+                    'status' => 404,
+                    'data' => [],
+                    'message' => 'There is no data for the given ID.'
+                ], 404);
+            }
+        } else {
+            return response()->json([
+                'success' => false,
+                'status' => 400,
+                'data' => [],
+                'message' => 'The :id parameter must be of integer type.'
+            ], 400);
+        }
     }
 }
