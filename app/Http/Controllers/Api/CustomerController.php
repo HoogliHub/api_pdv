@@ -800,4 +800,153 @@ class CustomerController extends Controller
             ], 400);
         }
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/enjoy/customers/address",
+     *     summary="Get a list of addresses",
+     *     description="Retrieve a list of addresses with optional sorting and pagination.",
+     *     tags={"Customers"},
+     *     @OA\Parameter(
+     *         name="sort",
+     *         in="query",
+     *         description="Field to sort by",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"id", "user_id", "address", "postal_code", "created_at", "updated_at"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="order",
+     *         in="query",
+     *         description="Sort order",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"asc", "desc"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Number of records per page",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="offset",
+     *         in="query",
+     *         description="Number of records to skip for pagination",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=0)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of addresses",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="sort", type="array", @OA\Items(type="string", enum={"id", "user_id", "address", "postal_code", "created_at", "updated_at"})),
+     *                     @OA\Property(property="fieldsAvailableSortBy", type="array", @OA\Items(type="string", enum={"id", "user_id", "address", "postal_code", "created_at", "updated_at"})),
+     *                     @OA\Property(property="paging", type="object", @OA\Property(property="total", type="integer"), @OA\Property(property="page", type="integer"), @OA\Property(property="limit", type="integer"), @OA\Property(property="lastPage", type="integer")),
+     *                     @OA\Property(property="CustomerAddresses", type="array", @OA\Items(
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="user_id", type="integer"),
+     *                         @OA\Property(property="address", type="string"),
+     *                         @OA\Property(property="country", type="string"),
+     *                         @OA\Property(property="state", type="string"),
+     *                         @OA\Property(property="city", type="string"),
+     *                         @OA\Property(property="longitude", type="number", format="float"),
+     *                         @OA\Property(property="latitude", type="number", format="float"),
+     *                         @OA\Property(property="zip_code", type="string"),
+     *                         @OA\Property(property="default_address", type="boolean"),
+     *                         @OA\Property(property="created_at", type="string", format="date-time"),
+     *                         @OA\Property(property="updated_at", type="string", format="date-time")
+     *                     ))
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="status", type="integer", example=500),
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
+     */
+    public function address_index(Request $request): JsonResponse
+    {
+        $data = [
+            'sort' => [
+                'field' => $request->query->get('sort') ?? 'id',
+                'direction' => $request->query->get('order') ?? 'asc'
+            ],
+            'fieldsAvailableSortBy' => [
+                'id',
+                'user_id',
+                'address',
+                'postal_code',
+                'created_at',
+                'updated_at',
+            ]
+        ];
+
+        $addressQuery = DB::connection('enjoy')->table('addresses as a')
+            ->select('a.*')
+            ->orderBy('a.id' ?? 'a.' . $request->query->get('sort'), $request->query->get('order') ?? 'asc');
+
+        if ($request->query->get('limit')) {
+            $addressQuery->limit($request->query->get('limit'));
+        }
+
+        if ($request->query->get('offset')) {
+            $addressQuery->offset($request->query->get('offset'));
+        }
+
+        if ($request->query->get('limit') || $request->query->get('offset')) {
+            $addresses = $addressQuery->get();
+        } else {
+            $addresses = $addressQuery->paginate(10);
+            $paging_data = [
+                "total" => $addresses->total(),
+                "page" => $addresses->currentPage(),
+                "limit" => $addresses->perPage(),
+                "lastPage" => $addresses->lastPage()
+            ];
+            $data['paging'] = $paging_data;
+        }
+
+        foreach ($addresses as $address) {
+            $country = DB::connection('enjoy')->table('countries')->select('name')->where('id', $address->country_id)->first();
+            $state = DB::connection('enjoy')->table('states')->select('name')->where('id', $address->state_id)->first();
+            $city = DB::connection('enjoy')->table('cities')->select('name')->where('id', $address->city_id)->first();
+            $address_data = [
+                'CustomerAddress' => [
+                    'id' => $address->id,
+                    'user_id' => $address->user_id,
+                    'address' => $address->address,
+                    'country' => $country?->name == 'Brazil' ? 'Brasil' : $country->name,
+                    'state' => $state?->name,
+                    'city' => $city?->name,
+                    'longitude' => $address->longitude,
+                    'latitude' => $address->latitude,
+                    'zip_code' => $address->postal_code,
+                    'default_address' => !($address->set_default == 0),
+                    'created_at' => $address->created_at,
+                    'updated_at' => $address->updated_at
+                ]
+            ];
+
+            $data['CustomerAddresses'][] = $address_data;
+        }
+
+        return response()->json([
+            'success' => true,
+            'status' => 200,
+            'data' => $data
+        ], 200);
+    }
 }

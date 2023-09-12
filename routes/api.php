@@ -39,6 +39,8 @@ Route::group(['prefix' => 'enjoy', 'as' => 'enjoy.'], function () {
         Route::post('/create', 'store')->name('create');
         Route::put('/update/{customer}', 'update')->name('update');
         Route::delete('/delete/{customer}', 'destroy')->name('delete');
+
+        Route::get('/address/', 'address_index')->name('address_index');
     });
 });
 

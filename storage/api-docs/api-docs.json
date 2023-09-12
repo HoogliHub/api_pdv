@@ -944,6 +944,215 @@
                 }
             }
         },
+        "/api/enjoy/customers/address": {
+            "get": {
+                "tags": [
+                    "Customers"
+                ],
+                "summary": "Get a list of addresses",
+                "description": "Retrieve a list of addresses with optional sorting and pagination.",
+                "operationId": "6521cb528273c287df22bf0cc1766689",
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Field to sort by",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "id",
+                                "user_id",
+                                "address",
+                                "postal_code",
+                                "created_at",
+                                "updated_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "Sort order",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of records per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "Number of records to skip for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 0
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of addresses",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "sort": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "id",
+                                                                "user_id",
+                                                                "address",
+                                                                "postal_code",
+                                                                "created_at",
+                                                                "updated_at"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "fieldsAvailableSortBy": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "id",
+                                                                "user_id",
+                                                                "address",
+                                                                "postal_code",
+                                                                "created_at",
+                                                                "updated_at"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "paging": {
+                                                        "properties": {
+                                                            "total": {
+                                                                "type": "integer"
+                                                            },
+                                                            "page": {
+                                                                "type": "integer"
+                                                            },
+                                                            "limit": {
+                                                                "type": "integer"
+                                                            },
+                                                            "lastPage": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "CustomerAddresses": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "user_id": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "address": {
+                                                                    "type": "string"
+                                                                },
+                                                                "country": {
+                                                                    "type": "string"
+                                                                },
+                                                                "state": {
+                                                                    "type": "string"
+                                                                },
+                                                                "city": {
+                                                                    "type": "string"
+                                                                },
+                                                                "longitude": {
+                                                                    "type": "number",
+                                                                    "format": "float"
+                                                                },
+                                                                "latitude": {
+                                                                    "type": "number",
+                                                                    "format": "float"
+                                                                },
+                                                                "zip_code": {
+                                                                    "type": "string"
+                                                                },
+                                                                "default_address": {
+                                                                    "type": "boolean"
+                                                                },
+                                                                "created_at": {
+                                                                    "type": "string",
+                                                                    "format": "date-time"
+                                                                },
+                                                                "updated_at": {
+                                                                    "type": "string",
+                                                                    "format": "date-time"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal server error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/enjoy/orders": {
             "get": {
                 "tags": [
