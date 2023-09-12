@@ -55,3 +55,29 @@ if (!function_exists('get_card_type')) {
         return $card_type[$type] ?? 'Desconhecido';
     }
 }
+
+if (!function_exists('get_normalized_string')) {
+    /**
+     * Returns a normalized version of the string by removing special characters.
+     *
+     * @param string $string The string to be normalized.
+     * @return string The normalized string.
+     */
+    function get_normalized_string(string $string): string
+    {
+        return str_replace(['-', '.', '_', ' ', '(', ')'], '', $string);
+    }
+}
+
+if (!function_exists('get_six_digits_cpf')) {
+    /**
+     * Returns the first six digits of the CPF.
+     *
+     * @param string $cpf The complete CPF.
+     * @return string The first six digits of the CPF.
+     */
+    function get_six_digits_cpf(string $cpf): string
+    {
+        return substr($cpf, 0, 6);
+    }
+}

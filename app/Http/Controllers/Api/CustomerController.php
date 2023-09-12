@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use OpenApi\Annotations as OA;
 use Throwable;
 
@@ -310,9 +312,9 @@ class CustomerController extends Controller
             $userId = DB::connection('enjoy')->table('users')->insertGetId([
                 'name' => $request->input('name'),
                 'email' => $request->input('email'),
-                'password' => $request->input('password') ? Hash::make(substr(str_replace(['-', '.', '_', ' '], '', $request->input('cpf')), 0, 6)) : Hash::make($request->input('password')),
-                'cpf' => str_replace(['-', '.', '_', ' '], '', $request->input('cpf')),
-                'phone' => $request->input('phone'),
+                'password' => $request->input('password') ? Hash::make(get_six_digits_cpf(get_normalized_string($request->input('cpf')))) : Hash::make($request->input('password')),
+                'cpf' => get_normalized_string($request->input('cpf')),
+                'phone' => get_normalized_string($request->input('phone')),
                 'created_at' => now(),
                 'updated_at' => now(),
                 'user_type' => 'customer'
@@ -329,7 +331,7 @@ class CustomerController extends Controller
                     'country_id' => $country->id,
                     'state_id' => $state->id,
                     'city_id' => $city->id,
-                    'postal_code' => str_replace(['-', '_', '.', ' '], '', $address['zip_code']),
+                    'postal_code' => get_normalized_string($address['zip_code']),
                     'set_default' => !$address['default_address'] ? 0 : 1,
                     'created_at' => now(),
                     'updated_at' => now()
@@ -486,11 +488,223 @@ class CustomerController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/api/enjoy/customers/update/{id}",
+     *     summary="Update a user",
+     *     description="Updates a user and associated addresses.",
+     *     tags={"Customers"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID of the user",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="User data and addresses",
+     *         @OA\JsonContent(
+     *             required={"name", "email", "cpf", "phone", "CustomerAddress"},
+     *             @OA\Property(property="name", type="string", description="User name"),
+     *             @OA\Property(property="email", type="string", format="email", description="User email"),
+     *             @OA\Property(property="password", type="string", description="User password"),
+     *             @OA\Property(property="cpf", type="string", description="User CPF"),
+     *             @OA\Property(property="phone", type="string", description="User phone"),
+     *             @OA\Property(
+     *                 property="CustomerAddress",
+     *                 type="array",
+     *                 description="Customer address list",
+     *                 @OA\Items(
+     *                     @OA\Property(property="id", type="integer", description="Address ID"),
+     *                     @OA\Property(property="address", type="string", description="Address"),
+     *                     @OA\Property(property="country", type="string", description="Address country"),
+     *                     @OA\Property(property="state", type="string", description="Address state"),
+     *                     @OA\Property(property="city", type="string", description="Address city"),
+     *                     @OA\Property(property="zip_code", type="string", description="Address zip code"),
+     *                     @OA\Property(property="default_address", type="boolean", description="Indicates whether it is the default address (true) or not (false)."),
+     *                     @OA\Property(property="latitude", type="number", format="float", description="Latitude"),
+     *                     @OA\Property(property="longitude", type="number", format="float", description="Longitude")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User updated successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="message", type="string", example="User updated successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *          response=400,
+     *          description="Erro de validação",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="status", type="integer", example=400),
+     *              @OA\Property(property="message", type="string", example="Required fields are missing or incorrect."),
+     *              @OA\Property(property="errors", type="object", example={"name": {"The name field is required."}})
+     *          )
+     *      ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="There is no data for the given ID",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="status", type="integer", example=404),
+     *             @OA\Property(property="data", type="object"),
+     *             @OA\Property(property="message", type="string", example="There is no data for the given ID.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="status", type="integer", example=500),
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $id): JsonResponse
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'name' => 'string',
+            'email' => 'email',
+            'password' => 'string',
+            'cpf' => 'string|cpf',
+            'phone' => 'string',
+            'CustomerAddress' => 'array',
+            'CustomerAddress.*.id' => ['integer', Rule::requiredIf($request->has('CustomerAddress'))],
+            'CustomerAddress.*.address' => 'string',
+            'CustomerAddress.*.country' => 'string',
+            'CustomerAddress.*.state' => 'string',
+            'CustomerAddress.*.city' => 'string',
+            'CustomerAddress.*.zip_code' => 'string',
+            'CustomerAddress.*.default_address' => 'boolean',
+            'CustomerAddress.*.latitude' => 'latitude',
+            'CustomerAddress.*.longitude' => 'longitude',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'status' => 400,
+                'message' => 'Required fields are missing or incorrect.',
+                'erros' => $validator->errors()
+            ], 400);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            if (is_numeric(trim($id))) {
+                $customer = DB::connection('enjoy')->table('users')->where('id', '=', $id);
+                if ($customer) {
+                    $update_customer_data = [
+                        'updated_at' => now()
+                    ];
+
+                    if ($request->has('name')) {
+                        $update_customer_data['name'] = $request->input('name');
+                    }
+                    if ($request->has('email')) {
+                        $update_customer_data['email'] = $request->input('email');
+                    }
+                    if ($request->has('password')) {
+                        $update_customer_data['password'] = Hash::make($request->input('password'));
+                    }
+                    if ($request->has('cpf')) {
+                        $update_customer_data['cpf'] = get_normalized_string($request->input('cpf'));
+                    }
+                    if ($request->has('phone')) {
+                        $update_customer_data['phone'] = get_normalized_string($request->input('phone'));
+                    }
+
+                    $customer->update($update_customer_data);
+
+                    if ($request->has('CustomerAddress')) {
+
+                        $update_address_data = [
+                            'updated_at' => now()
+                        ];
+
+                        foreach ($request->input('CustomerAddress') as $address) {
+                            $customer_address = DB::connection('enjoy')->table('addresses')
+                                ->where('user_id', $customer->pluck('id')->first())
+                                ->where('id', $address['id']);
+
+                            if ($address['country']) {
+                                $country = DB::connection('enjoy')->table('countries')->select('id')->where('name', 'LIKE', '%' . ($address['country'] == 'Brasil' ? 'Brazil' : $address['country']) . '%')->first();
+                                $update_address_data['country_id'] = $country->id;
+                            }
+
+                            if ($address['state']) {
+                                $state = DB::connection('enjoy')->table('states')->select('id')->where('name', 'LIKE', '%' . $address['state'] . '%')->where('country_id', '=', $country->id)->first();
+                                $update_address_data['state_id'] = $state->id;
+                            }
+
+                            if ($address['city']) {
+                                $city = DB::connection('enjoy')->table('cities')->select('id')->where('name', 'LIKE', '%' . $address['city'] . '%')->where('state_id', '=', $state->id)->first();
+                                $update_address_data['city_id'] = $city->id;
+                            }
+
+                            if ($address['address']) {
+                                $update_address_data['address'] = $address['address'];
+                            }
+                            if ($address['default_address']) {
+                                $update_address_data['set_default'] = !$address['default_address'] ? 0 : 1;
+                            }
+                            if ($address['latitude']) {
+                                $update_address_data['latitude'] = $address['latitude'];
+                            }
+                            if ($address['longitude']) {
+                                $update_address_data['longitude'] = $address['longitude'];
+                            }
+                            if ($address['zip_code']) {
+                                $update_address_data['postal_code'] = get_normalized_string($address['zip_code']);
+                            }
+
+                            $customer_address->update($update_address_data);
+                        }
+                    }
+                    DB::commit();
+                    return response()->json([
+                        'success' => true,
+                        'code' => 204,
+                        'status' => true,
+                        'message' => 'User updated successfully'
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'success' => true,
+                        'status' => 404,
+                        'data' => [],
+                        'message' => 'There is no data for the given ID.'
+                    ], 404);
+                }
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'status' => 400,
+                    'data' => [],
+                    'message' => 'The :id parameter must be of integer type.'
+                ], 400);
+            }
+
+        } catch (Throwable $th) {
+            DB::rollback();
+            return response()->json([
+                'success' => false,
+                'status' => 500,
+                'message' => 'Internal server error',
+            ], 500);
+        }
+
     }
 
     /**
@@ -549,7 +763,7 @@ class CustomerController extends Controller
      *     )
      * )
      */
-    public function destroy(string $id)
+    public function destroy(string $id): JsonResponse
     {
         if (is_numeric(trim($id))) {
 
