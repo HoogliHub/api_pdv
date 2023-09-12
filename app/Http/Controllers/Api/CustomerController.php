@@ -949,4 +949,117 @@ class CustomerController extends Controller
             'data' => $data
         ], 200);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/enjoy/customers/address/show/{id}",
+     *     summary="Get a specific address",
+     *     description="Retrieve a specific address by its ID.",
+     *     tags={"Customers"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID of the address",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Address information",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="CustomerAddress", type="array",
+     *                         @OA\Items(
+     *                             @OA\Property(property="id", type="integer"),
+     *                             @OA\Property(property="user_id", type="integer"),
+     *                             @OA\Property(property="address", type="string"),
+     *                             @OA\Property(property="country", type="string"),
+     *                             @OA\Property(property="state", type="string"),
+     *                             @OA\Property(property="city", type="string"),
+     *                             @OA\Property(property="longitude", type="number", format="float"),
+     *                             @OA\Property(property="latitude", type="number", format="float"),
+     *                             @OA\Property(property="zip_code", type="string"),
+     *                             @OA\Property(property="default_address", type="boolean"),
+     *                             @OA\Property(property="created_at", type="string", format="date-time"),
+     *                             @OA\Property(property="updated_at", type="string", format="date-time")
+     *                         )
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Address not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="status", type="integer", example=404),
+     *             @OA\Property(property="data", type="object"),
+     *             @OA\Property(property="message", type="string", example="There is no data for the given ID.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid ID format",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="status", type="integer", example=400),
+     *             @OA\Property(property="data", type="object"),
+     *             @OA\Property(property="message", type="string", example="The :id parameter must be of integer type.")
+     *         )
+     *     )
+     * )
+     */
+    public function address_show(string $id): JsonResponse
+    {
+        if (is_numeric(trim($id))) {
+            $addressQuery = DB::connection('enjoy')->table('addresses as a')
+                ->select('a.*')
+                ->where('a.id', '=', $id)
+                ->first();
+            if ($addressQuery) {
+                $country = DB::connection('enjoy')->table('countries')->select('name')->where('id', $addressQuery->country_id)->first();
+                $state = DB::connection('enjoy')->table('states')->select('name')->where('id', $addressQuery->state_id)->first();
+                $city = DB::connection('enjoy')->table('cities')->select('name')->where('id', $addressQuery->city_id)->first();
+                $data['CustomerAddress'] = [
+                    'id' => $addressQuery->id,
+                    'user_id' => $addressQuery->user_id,
+                    'address' => $addressQuery->address,
+                    'country' => $country?->name == 'Brazil' ? 'Brasil' : $country->name,
+                    'state' => $state?->name,
+                    'city' => $city?->name,
+                    'longitude' => $addressQuery->longitude,
+                    'latitude' => $addressQuery->latitude,
+                    'zip_code' => $addressQuery->postal_code,
+                    'default_address' => !($addressQuery->set_default == 0),
+                    'created_at' => $addressQuery->created_at,
+                    'updated_at' => $addressQuery->updated_at
+                ];
+                return response()->json([
+                    'success' => true,
+                    'status' => 200,
+                    'data' => $data
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => true,
+                    'status' => 404,
+                    'data' => [],
+                    'message' => 'There is no data for the given ID.'
+                ], 404);
+            }
+        } else {
+            return response()->json([
+                'success' => false,
+                'status' => 400,
+                'data' => [],
+                'message' => 'The :id parameter must be of integer type.'
+            ], 400);
+        }
+    }
 }

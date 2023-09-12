@@ -41,6 +41,7 @@ Route::group(['prefix' => 'enjoy', 'as' => 'enjoy.'], function () {
         Route::delete('/delete/{customer}', 'destroy')->name('delete');
 
         Route::get('/address/', 'address_index')->name('address_index');
+        Route::get('/address/show/{address}', 'address_show')->name('address_show');
     });
 });
 
