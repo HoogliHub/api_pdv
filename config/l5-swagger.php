@@ -5,7 +5,7 @@ return [
     'documentations' => [
         'default' => [
             'api' => [
-                'title' => 'L5 Swagger UI',
+                'title' => 'API Guide - Enjoy Developers',
             ],
 
             'routes' => [
@@ -43,6 +43,7 @@ return [
                 ],
 
             ],
+            'language' => env('L5_SWAGGER_DEFAULT_LANGUAGE', 'en')
         ],
     ],
     'defaults' => [
