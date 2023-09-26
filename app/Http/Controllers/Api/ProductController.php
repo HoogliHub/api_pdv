@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\EnjoyUrlService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,14 @@ use function response;
 
 class ProductController extends Controller
 {
+
+    private $urlService;
+
+    public function __construct(EnjoyUrlService $urlService)
+    {
+        $this->urlService = $urlService;
+    }
+
     /**
      * @OA\Get(
      *     path="/api/enjoy/products",
@@ -194,9 +203,6 @@ class ProductController extends Controller
                 $promotionalPrice = $product->unit_price - ceil($discountedPrice);
             }
 
-            $baseHttpUrl = env('APP_ENV') === 'local' || env('APP_DEBUG') === true ? str_replace('https', 'http', env('ENJOY_URL_HOMOLOGATION')) : str_replace('https', 'http', env('ENJOY_URL_PRODUCTION'));
-            $baseHttpsUrl = env('APP_ENV') === 'local' || env('APP_DEBUG') === true ? env('ENJOY_URL_HOMOLOGATION') : env('ENJOY_URL_PRODUCTION');
-
             $variants = explode(',', $product->variants);
             $variantData = [];
 
@@ -213,8 +219,8 @@ class ProductController extends Controller
 
             foreach ($product->photo_names as $photo) {
                 $photosInfo = [
-                    'http' => $baseHttpUrl . 'public/' . $photo,
-                    'https' => $baseHttpsUrl . 'public/' . $photo
+                    'http' => $this->urlService->getHttpUrl() . 'public/' . $photo,
+                    'https' => $this->urlService->getHttpsUrl() . 'public/' . $photo
                 ];
                 $photosData[] = $photosInfo;
             }
@@ -261,8 +267,8 @@ class ProductController extends Controller
                 "count_rating" => $product->rating,
                 "quantity_sold" => $product->quantity_sold,
                 'url' => [
-                    'http' => $baseHttpUrl . 'produto/' . $product->slug,
-                    'https' => $baseHttpsUrl . 'produto/' . $product->slug,
+                    'http' => $this->urlService->getHttpUrl() . 'produto/' . $product->slug,
+                    'https' => $this->urlService->getHttpsUrl() . 'produto/' . $product->slug,
                 ],
                 'created' => $product->created_at,
                 'Properties' => $variantData,
@@ -418,9 +424,6 @@ class ProductController extends Controller
 
     public function show(string $id): JsonResponse
     {
-        $baseHttpUrl = env('APP_ENV') === 'local' || env('APP_DEBUG') === true ? str_replace('https', 'http', env('ENJOY_URL_HOMOLOGATION')) : str_replace('https', 'http', env('ENJOY_URL_PRODUCTION'));
-        $baseHttpsUrl = env('APP_ENV') === 'local' || env('APP_DEBUG') === true ? env('ENJOY_URL_HOMOLOGATION') : env('ENJOY_URL_PRODUCTION');
-
         if (is_numeric(trim($id))) {
             $product = DB::connection('enjoy')->table('products as p')
                 ->select('p.*')
@@ -473,8 +476,8 @@ class ProductController extends Controller
 
                 foreach ($product->photo_names as $photo) {
                     $photosInfo = [
-                        'http' => $baseHttpUrl . 'public/' . $photo,
-                        'https' => $baseHttpsUrl . 'public/' . $photo
+                        'http' => $this->urlService->getHttpUrl() . 'public/' . $photo,
+                        'https' => $this->urlService->getHttpsUrl() . 'public/' . $photo
                     ];
                     $photosData[] = $photosInfo;
                 }
@@ -540,8 +543,8 @@ class ProductController extends Controller
                     'ProductImage' => $photosData,
                     'image' => count($photosData) > 0 ? '1' : '0',
                     'url' => [
-                        'http' => $baseHttpUrl . 'produto/' . $product->slug,
-                        'https' => $baseHttpsUrl . 'produto/' . $product->slug,
+                        'http' => $this->urlService->getHttpUrl() . 'produto/' . $product->slug,
+                        'https' => $this->urlService->getHttpsUrl() . 'produto/' . $product->slug,
                     ],
                     'created' => $product->created_at,
                     'Properties' => $variantData,

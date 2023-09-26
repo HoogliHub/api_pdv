@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\EnjoyUrlService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,6 +12,13 @@ use function response;
 
 class OrderController extends Controller
 {
+    private $urlService;
+
+    public function __construct(EnjoyUrlService $urlService)
+    {
+        $this->urlService = $urlService;
+    }
+
     /**
      * @OA\Get(
      *     path="/api/enjoy/orders",
@@ -509,9 +517,6 @@ class OrderController extends Controller
     public function show_details(string $id): JsonResponse
     {
         if (is_numeric(trim($id))) {
-            $baseHttpUrl = env('APP_ENV') === 'local' || env('APP_DEBUG') === true ? str_replace('https', 'http', env('ENJOY_URL_HOMOLOGATION')) : str_replace('https', 'http', env('ENJOY_URL_PRODUCTION'));
-            $baseHttpsUrl = env('APP_ENV') === 'local' || env('APP_DEBUG') === true ? env('ENJOY_URL_HOMOLOGATION') : env('ENJOY_URL_PRODUCTION');
-
             $order = DB::connection('enjoy')->table('orders as o')
                 ->select('o.*')
                 ->addSelect('od.tax', 'od.price', 'od.product_id', 'od.shipping_cost', 'od.variation')
@@ -550,8 +555,8 @@ class OrderController extends Controller
 
                     foreach ($photo_names as $photo) {
                         $photosInfo = [
-                            'http' => $baseHttpUrl . 'public/' . $photo,
-                            'https' => $baseHttpsUrl . 'public/' . $photo
+                            'http' => $this->urlService->getHttpUrl() . 'public/' . $photo,
+                            'https' => $this->urlService->getHttpsUrl() . 'public/' . $photo
                         ];
                         $photos_data[] = $photosInfo;
                     }
@@ -584,8 +589,8 @@ class OrderController extends Controller
                                 'main_category_name' => $order_product->parent_id != 0 ? $order_product->main_category : null
                             ],
                             'url' => [
-                                'http' => $baseHttpUrl . 'produto/' . $order_product->product_slug,
-                                'https' => $baseHttpsUrl . 'produto/' . $order_product->product_slug,
+                                'http' => $this->urlService->getHttpUrl() . 'produto/' . $order_product->product_slug,
+                                'https' => $this->urlService->getHttpsUrl() . 'produto/' . $order_product->product_slug,
                             ]
                         ]
                     ];

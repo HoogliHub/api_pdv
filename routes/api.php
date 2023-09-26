@@ -43,6 +43,11 @@ Route::group(['prefix' => 'enjoy', 'as' => 'enjoy.'], function () {
         Route::get('/address/', 'address_index')->name('address_index');
         Route::get('/address/show/{address}', 'address_show')->name('address_show');
     });
+    Route::controller('App\Http\Controllers\Api\CategoryController')->prefix('categories')->name('categories.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/show/{category}', 'show')->name('show');
+        Route::post('/create', 'store')->name('create');
+    });
 });
 
 Route::fallback(function () {

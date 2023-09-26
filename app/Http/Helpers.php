@@ -81,3 +81,22 @@ if (!function_exists('get_six_digits_cpf')) {
         return substr($cpf, 0, 6);
     }
 }
+
+if (!function_exists('generate_image_urls')) {
+    /**
+     * Generates URLs for a given image and base URLs.
+     *
+     * @param string|null $image The image path or null if there is no image.
+     * @param string $baseUrlHttp The base HTTP URL to be used in generation.
+     * @param string $baseUrlHttps The base HTTPS URL to be used in generation.
+     *
+     * @return array An associative array containing URLs for HTTP and HTTPS.
+     */
+    function generate_image_urls(?string $image, string $baseUrlHttp, string $baseUrlHttps): array
+    {
+        return [
+            'http' => $image !== null ? $baseUrlHttp . 'public/' . $image : '',
+            'https' => $image !== null ? $baseUrlHttps . 'public/' . $image : ''
+        ];
+    }
+}
