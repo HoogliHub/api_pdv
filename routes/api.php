@@ -46,7 +46,10 @@ Route::group(['prefix' => 'enjoy', 'as' => 'enjoy.'], function () {
     Route::controller('App\Http\Controllers\Api\CategoryController')->prefix('categories')->name('categories.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/show/{category}', 'show')->name('show');
+        Route::get('/show/tree/{category}', 'show_tree')->name('show');
         Route::post('/create', 'store')->name('create');
+        Route::put('/update/{category}', 'update')->name('update');
+        Route::delete('/delete/{category}', 'destroy')->name('delete');
     });
 });
 

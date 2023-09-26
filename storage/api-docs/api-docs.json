@@ -13,63 +13,149 @@
         "version": "1.0.0"
     },
     "paths": {
-        "/api/enjoy/auth/register": {
-            "post": {
+        "/api/enjoy/categories": {
+            "get": {
                 "tags": [
-                    "Users"
+                    "Categories"
                 ],
-                "summary": "Create a new user",
-                "description": "Creates a new user with the provided name, email, and password.",
-                "operationId": "1c653af1c5cf95abbf5f7d89f0b33595",
-                "requestBody": {
-                    "description": "User data",
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name",
-                                    "email",
-                                    "password"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "description": "User name",
-                                        "type": "string"
-                                    },
-                                    "email": {
-                                        "description": "User email",
-                                        "type": "string",
-                                        "format": "email"
-                                    },
-                                    "password": {
-                                        "description": "User password",
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
+                "summary": "Get a list of categories",
+                "operationId": "908868ce2f43c7d9361fca670a9a5fff",
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort field (e.g., id, name, parent_id, created_at, updated_at)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "Number of items to skip",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
                         }
                     }
-                },
+                ],
                 "responses": {
-                    "201": {
-                        "description": "User created successfully",
+                    "200": {
+                        "description": "Successful operation",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
                                         "status": {
-                                            "type": "boolean",
-                                            "example": true
+                                            "type": "integer"
                                         },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "User created successfully"
-                                        },
-                                        "token": {
-                                            "type": "string",
-                                            "example": "API_TOKEN"
+                                        "data": {
+                                            "properties": {
+                                                "sort": {
+                                                    "properties": {
+                                                        "field": {
+                                                            "type": "string"
+                                                        },
+                                                        "direction": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "fieldsAvailableSortBy": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "paging": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer"
+                                                        },
+                                                        "page": {
+                                                            "type": "integer"
+                                                        },
+                                                        "limit": {
+                                                            "type": "integer"
+                                                        },
+                                                        "lastPage": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "Categories": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "Category": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "parent_id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "Images": {
+                                                                        "properties": {
+                                                                            "banner": {
+                                                                                "properties": {
+                                                                                    "http": {
+                                                                                        "type": "string"
+                                                                                    },
+                                                                                    "https": {
+                                                                                        "type": "string"
+                                                                                    }
+                                                                                },
+                                                                                "type": "object"
+                                                                            },
+                                                                            "icon": {
+                                                                                "properties": {
+                                                                                    "http": {
+                                                                                        "type": "string"
+                                                                                    },
+                                                                                    "https": {
+                                                                                        "type": "string"
+                                                                                    }
+                                                                                },
+                                                                                "type": "object"
+                                                                            }
+                                                                        },
+                                                                        "type": "object"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -77,47 +163,23 @@
                             }
                         }
                     },
-                    "422": {
+                    "400": {
                         "description": "Validation error",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
                                         "status": {
-                                            "type": "boolean",
-                                            "example": false
+                                            "type": "integer"
                                         },
                                         "message": {
-                                            "type": "string",
-                                            "example": "Validation error"
+                                            "type": "string"
                                         },
                                         "errors": {
-                                            "type": "object",
-                                            "example": {
-                                                "email": [
-                                                    "The email has already been taken."
-                                                ]
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Internal server error"
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -128,33 +190,48 @@
                 }
             }
         },
-        "/api/enjoy/auth/login": {
+        "/api/enjoy/categories/create": {
             "post": {
                 "tags": [
-                    "Users"
+                    "Categories"
                 ],
-                "summary": "Login as a user",
-                "description": "Authenticates a user using their email and password.",
-                "operationId": "fdbe8ab3b4af53836f55e277e695bd52",
+                "summary": "Create a new category",
+                "operationId": "85a6b8a7beb15c0145026b549f071038",
                 "requestBody": {
-                    "description": "User login data",
-                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": [
-                                    "email",
-                                    "password"
-                                ],
                                 "properties": {
-                                    "email": {
-                                        "description": "User email",
-                                        "type": "string",
-                                        "format": "email"
-                                    },
-                                    "password": {
-                                        "description": "User password",
-                                        "type": "string"
+                                    "Category": {
+                                        "properties": {
+                                            "is_featured": {
+                                                "type": "boolean"
+                                            },
+                                            "metatag": {
+                                                "type": "array",
+                                                "items": {
+                                                    "properties": {
+                                                        "description": {
+                                                            "type": "string"
+                                                        },
+                                                        "title": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "parent_id": {
+                                                "type": "integer"
+                                            },
+                                            "slug": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
                                     }
                                 },
                                 "type": "object"
@@ -163,23 +240,26 @@
                     }
                 },
                 "responses": {
-                    "200": {
-                        "description": "User logged in successfully",
+                    "201": {
+                        "description": "Category Created Successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "code": {
+                                            "type": "integer"
+                                        },
                                         "status": {
-                                            "type": "boolean",
-                                            "example": true
+                                            "type": "boolean"
                                         },
                                         "message": {
-                                            "type": "string",
-                                            "example": "User logged in successfully"
+                                            "type": "string"
                                         },
-                                        "token": {
-                                            "type": "string",
-                                            "example": "API_TOKEN"
+                                        "category_id": {
+                                            "type": "integer"
                                         }
                                     },
                                     "type": "object"
@@ -187,47 +267,23 @@
                             }
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Email & Password do not match our records."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
+                    "400": {
                         "description": "Validation error",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
                                         "status": {
-                                            "type": "boolean",
-                                            "example": false
+                                            "type": "integer"
                                         },
                                         "message": {
-                                            "type": "string",
-                                            "example": "Validation error"
+                                            "type": "string"
                                         },
                                         "errors": {
-                                            "type": "object",
-                                            "example": {
-                                                "email": [
-                                                    "The email field is required."
-                                                ]
-                                            }
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -241,13 +297,638 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
                                         "status": {
-                                            "type": "boolean",
-                                            "example": false
+                                            "type": "integer"
                                         },
                                         "message": {
-                                            "type": "string",
-                                            "example": "Internal server error"
+                                            "type": "string"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/enjoy/categories/show/{id}": {
+            "get": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Get information about a specific category",
+                "operationId": "d385c9369670f85bc5ef528e5a0e5932",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the category",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category information retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "Category": {
+                                                    "properties": {
+                                                        "slug": {
+                                                            "type": "string"
+                                                        },
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "parent_id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "order": {
+                                                            "type": "integer"
+                                                        },
+                                                        "link": {
+                                                            "properties": {
+                                                                "http": {
+                                                                    "type": "string"
+                                                                },
+                                                                "https": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "metatag": {
+                                                            "properties": {
+                                                                "meta_title": {
+                                                                    "type": "string"
+                                                                },
+                                                                "meta_description": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "Images": {
+                                                            "properties": {
+                                                                "banner": {
+                                                                    "type": "string"
+                                                                },
+                                                                "icon": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID format",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/enjoy/categories/show/tree/{id}": {
+            "get": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Show a category tree",
+                "operationId": "6a06d2c421c1416c17850de736696792",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the category",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category tree retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "Category": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "slug": {
+                                                                "type": "string"
+                                                            },
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "parent_id": {
+                                                                "type": "integer|null"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "order": {
+                                                                "type": "integer"
+                                                            },
+                                                            "link": {
+                                                                "properties": {
+                                                                    "http": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "https": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            },
+                                                            "metatag": {
+                                                                "properties": {
+                                                                    "meta_title": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "meta_description": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            },
+                                                            "Images": {
+                                                                "properties": {
+                                                                    "banner": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "icon": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            },
+                                                            "has_product": {
+                                                                "type": "integer"
+                                                            },
+                                                            "children": {
+                                                                "properties": {
+                                                                    "Category": {
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "properties": {
+                                                                                "slug": {
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "id": {
+                                                                                    "type": "integer"
+                                                                                },
+                                                                                "parent_id": {
+                                                                                    "type": "integer|null"
+                                                                                },
+                                                                                "name": {
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "order": {
+                                                                                    "type": "integer"
+                                                                                },
+                                                                                "link": {
+                                                                                    "properties": {
+                                                                                        "http": {
+                                                                                            "type": "string"
+                                                                                        },
+                                                                                        "https": {
+                                                                                            "type": "string"
+                                                                                        }
+                                                                                    },
+                                                                                    "type": "object"
+                                                                                },
+                                                                                "metatag": {
+                                                                                    "properties": {
+                                                                                        "meta_title": {
+                                                                                            "type": "string"
+                                                                                        },
+                                                                                        "meta_description": {
+                                                                                            "type": "string"
+                                                                                        }
+                                                                                    },
+                                                                                    "type": "object"
+                                                                                },
+                                                                                "Images": {
+                                                                                    "properties": {
+                                                                                        "banner": {
+                                                                                            "type": "string"
+                                                                                        },
+                                                                                        "icon": {
+                                                                                            "type": "string"
+                                                                                        }
+                                                                                    },
+                                                                                    "type": "object"
+                                                                                },
+                                                                                "has_product": {
+                                                                                    "type": "integer"
+                                                                                },
+                                                                                "children": {
+                                                                                    "type": "array",
+                                                                                    "items": {}
+                                                                                }
+                                                                            },
+                                                                            "type": "object"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/enjoy/categories/update/{id}": {
+            "put": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Update a category",
+                "operationId": "321297e770dd0e13185275d5461160e1",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the category",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "Category": {
+                                        "properties": {
+                                            "is_featured": {
+                                                "type": "boolean"
+                                            },
+                                            "metatag": {
+                                                "type": "array",
+                                                "items": {
+                                                    "properties": {
+                                                        "description": {
+                                                            "type": "string"
+                                                        },
+                                                        "title": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "parent_id": {
+                                                "type": "integer"
+                                            },
+                                            "slug": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Category updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "status": {
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "category_id": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/enjoy/categories/delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Delete a category",
+                "operationId": "8a30261ac93e418c26a37978ec401d9a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the category",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
