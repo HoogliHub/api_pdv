@@ -23,33 +23,45 @@ Route::group(['prefix' => 'enjoy', 'as' => 'enjoy.'], function () {
         Route::post('/auth/register', 'create_user')->name('register');
         Route::post('/auth/login', 'login_user')->name('login');
     });
+    //Product Variation
+    Route::controller('App\Http\Controllers\Api\ProductVariationController')->prefix('products/variants')->name('products_variants.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/{variant}', 'show')->name('show');
+        Route::post('/create', 'store')->name('create');
+        Route::put('/{variant}', 'update')->name('update');
+        Route::delete('/{variant}', 'destroy')->name('delete');
+    });
+    //Products
     Route::controller('App\Http\Controllers\Api\ProductController')->prefix('products')->name('products.')->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::get('/show/{product}', 'show')->name('show');
-        Route::get('/sold/{product}', 'sold')->name('sold');
+        Route::get('/{product}', 'show')->name('show');
+        Route::get('/{product}/sold', 'sold')->name('sold');
     });
+    //Orders
     Route::controller('App\Http\Controllers\Api\OrderController')->prefix('orders')->name('orders.')->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::get('/show/{order}', 'show')->name('show');
-        Route::get('/show/{order}/complete', 'show_details')->name('show.details');
+        Route::get('/{order}', 'show')->name('show');
+        Route::get('/{order}/complete', 'show_details')->name('show.details');
     });
+    //Clients
     Route::controller('App\Http\Controllers\Api\CustomerController')->prefix('customers')->name('customers.')->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::get('/show/{customer}', 'show')->name('show');
+        Route::get('/{customer}', 'show')->name('show');
         Route::post('/create', 'store')->name('create');
-        Route::put('/update/{customer}', 'update')->name('update');
-        Route::delete('/delete/{customer}', 'destroy')->name('delete');
-
-        Route::get('/address/', 'address_index')->name('address_index');
-        Route::get('/address/show/{address}', 'address_show')->name('address_show');
+        Route::put('/{customer}', 'update')->name('update');
+        Route::delete('/{customer}', 'destroy')->name('delete');
+        //Address
+        Route::get('/addresses', 'address_index')->name('addresses.index');
+        Route::get('/addresses/{address}', 'address_show')->name('addresses.show');
     });
+    //Categories
     Route::controller('App\Http\Controllers\Api\CategoryController')->prefix('categories')->name('categories.')->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::get('/show/{category}', 'show')->name('show');
-        Route::get('/show/tree/{category}', 'show_tree')->name('show');
+        Route::get('/{category}', 'show')->name('show');
+        Route::get('/{category}/tree', 'show_tree')->name('show.tree');
         Route::post('/create', 'store')->name('create');
-        Route::put('/update/{category}', 'update')->name('update');
-        Route::delete('/delete/{category}', 'destroy')->name('delete');
+        Route::put('/{category}', 'update')->name('update');
+        Route::delete('/{category}', 'destroy')->name('delete');
     });
 });
 

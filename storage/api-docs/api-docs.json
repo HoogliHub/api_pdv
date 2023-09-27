@@ -3819,6 +3819,723 @@
                     }
                 }
             }
+        },
+        "/api/enjoy/products/variants": {
+            "get": {
+                "tags": [
+                    "Product Variations"
+                ],
+                "summary": "Get a list of product variations",
+                "operationId": "1ab62e6e84522021c8c56ec0b56e0ca6",
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort field (e.g., id, product_id, variant, sku, price, qty, created_at, updated_at)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit the number of results",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "Skip a number of results",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of product variations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "sort": {
+                                                    "properties": {
+                                                        "field": {
+                                                            "type": "string"
+                                                        },
+                                                        "direction": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "fieldsAvailableSortBy": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "paging": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer"
+                                                        },
+                                                        "page": {
+                                                            "type": "integer"
+                                                        },
+                                                        "limit": {
+                                                            "type": "integer"
+                                                        },
+                                                        "lastPage": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "Variants": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "Variant": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "product_id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "price": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "stock": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "minimum_stock": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "reference": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "quantity_sold": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "Sku": {
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "properties": {
+                                                                                "type": {
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "value": {
+                                                                                    "type": "string"
+                                                                                }
+                                                                            },
+                                                                            "type": "object"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/enjoy/products/variants/create": {
+            "post": {
+                "tags": [
+                    "Product Variations"
+                ],
+                "summary": "Create a new product variation",
+                "operationId": "f71f85890e29b23f1a5c9cbe18751f63",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "Variant"
+                                ],
+                                "properties": {
+                                    "Variant": {
+                                        "properties": {
+                                            "product_id": {
+                                                "type": "integer"
+                                            },
+                                            "price": {
+                                                "type": "string",
+                                                "format": "float"
+                                            },
+                                            "reference": {
+                                                "type": "string"
+                                            },
+                                            "stock": {
+                                                "type": "integer"
+                                            },
+                                            "type_1": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "Cor",
+                                                    "Tamanho"
+                                                ]
+                                            },
+                                            "value_1": {
+                                                "type": "string"
+                                            },
+                                            "type_2": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "Cor",
+                                                    "Tamanho"
+                                                ]
+                                            },
+                                            "value_2": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Product variation created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "status": {
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "variation_id": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/enjoy/products/variants/{id}": {
+            "get": {
+                "tags": [
+                    "Product Variations"
+                ],
+                "summary": "Get details of a product variation",
+                "operationId": "3249d201192b4cc80bf529970ba9dd1c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the product variation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Product variation details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "Variant": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "product_id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "price": {
+                                                            "type": "string",
+                                                            "format": "float"
+                                                        },
+                                                        "stock": {
+                                                            "type": "integer"
+                                                        },
+                                                        "minimum_stock": {
+                                                            "type": "integer"
+                                                        },
+                                                        "reference": {
+                                                            "type": "string"
+                                                        },
+                                                        "quantity_sold": {
+                                                            "type": "integer"
+                                                        },
+                                                        "Sku": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "type": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "value": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product variation not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Product Variations"
+                ],
+                "summary": "Update a product variation",
+                "operationId": "378c5933008d33ef25cedd8ac6c92b01",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the product variation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "Variant": {
+                                        "properties": {
+                                            "price": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 10.5
+                                            },
+                                            "product_id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "reference": {
+                                                "type": "string",
+                                                "example": "ABC123"
+                                            },
+                                            "stock": {
+                                                "type": "integer",
+                                                "example": 100
+                                            },
+                                            "type_1": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "Cor",
+                                                    "Tamanho"
+                                                ],
+                                                "example": "Cor"
+                                            },
+                                            "value_1": {
+                                                "type": "string",
+                                                "example": "Red"
+                                            },
+                                            "type_2": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "Cor",
+                                                    "Tamanho"
+                                                ],
+                                                "example": "Tamanho"
+                                            },
+                                            "value_2": {
+                                                "type": "string",
+                                                "example": "XL"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Product variation updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "status": {
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "category_id": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product variation not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Product Variations"
+                ],
+                "summary": "Delete a product variation",
+                "operationId": "11ac4c5da67d453a39ab78dee3d2dc1d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the product variation",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Product variation deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product variation not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
