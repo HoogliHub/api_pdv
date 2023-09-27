@@ -22,6 +22,7 @@ class CustomerController extends Controller
      *     operationId="getCustomers",
      *     summary="Get a list of customers",
      *     tags={"Customers"},
+     *     security={{ "bearerAuth": {} }},
      *     description="Retrieve a list of customers with sorting, paging, and filtering options.",
      *     @OA\Parameter(
      *         name="sort",
@@ -197,6 +198,7 @@ class CustomerController extends Controller
      *     summary="Create a new user",
      *     description="Creates a new user and associates addresses with it.",
      *     tags={"Customers"},
+     *     security={{ "bearerAuth": {} }},
      *     @OA\RequestBody(
      *         required=true,
      *         description="User data and addresses",
@@ -359,6 +361,7 @@ class CustomerController extends Controller
      *     path="/api/enjoy/customers/show/{id}",
      *     summary="Retrieve customer details by ID",
      *     tags={"Customers"},
+     *     security={{ "bearerAuth": {} }},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -493,6 +496,7 @@ class CustomerController extends Controller
      *     summary="Update a user",
      *     description="Updates a user and associated addresses.",
      *     tags={"Customers"},
+     *     security={{ "bearerAuth": {} }},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -711,6 +715,7 @@ class CustomerController extends Controller
      * @OA\Delete(
      *     path="/api/enjoy/customers/delete/{id}",
      *     tags={"Customers"},
+     *     security={{ "bearerAuth": {} }},
      *     summary="Delete a customer and associated addresses by ID.",
      *     operationId="deleteCustomer",
      *     @OA\Parameter(
@@ -807,6 +812,7 @@ class CustomerController extends Controller
      *     summary="Get a list of addresses",
      *     description="Retrieve a list of addresses with optional sorting and pagination.",
      *     tags={"Customers"},
+     *     security={{ "bearerAuth": {} }},
      *     @OA\Parameter(
      *         name="sort",
      *         in="query",
@@ -956,6 +962,7 @@ class CustomerController extends Controller
      *     summary="Get a specific address",
      *     description="Retrieve a specific address by its ID.",
      *     tags={"Customers"},
+     *     security={{ "bearerAuth": {} }},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",

@@ -26,6 +26,7 @@ class CategoryController extends Controller
      *     path="/api/enjoy/categories",
      *     summary="Get a list of categories",
      *     tags={"Categories"},
+     *     security={{ "bearerAuth": {} }},
      *     @OA\Parameter(
      *         name="sort",
      *         in="query",
@@ -172,6 +173,7 @@ class CategoryController extends Controller
      *     path="/api/enjoy/categories/create",
      *     summary="Create a new category",
      *     tags={"Categories"},
+     *     security={{ "bearerAuth": {} }},
      *     @OA\RequestBody(
      *         @OA\JsonContent(
      *             @OA\Property(property="Category", type="object",
@@ -303,6 +305,7 @@ class CategoryController extends Controller
      *     path="/api/enjoy/categories/show/{id}",
      *     summary="Get information about a specific category",
      *     tags={"Categories"},
+     *     security={{ "bearerAuth": {} }},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -417,6 +420,7 @@ class CategoryController extends Controller
      *     path="/api/enjoy/categories/show/tree/{id}",
      *     summary="Show a category tree",
      *     tags={"Categories"},
+     *     security={{ "bearerAuth": {} }},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -546,6 +550,7 @@ class CategoryController extends Controller
      *     path="/api/enjoy/categories/update/{id}",
      *     summary="Update a category",
      *     tags={"Categories"},
+     *     security={{ "bearerAuth": {} }},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -715,6 +720,7 @@ class CategoryController extends Controller
      *     path="/api/enjoy/categories/delete/{id}",
      *     summary="Delete a category",
      *     tags={"Categories"},
+     *     security={{ "bearerAuth": {} }},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",

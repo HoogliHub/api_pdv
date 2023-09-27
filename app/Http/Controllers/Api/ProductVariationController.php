@@ -18,6 +18,7 @@ class ProductVariationController extends Controller
      *     path="/api/enjoy/products/variants",
      *     summary="Get a list of product variations",
      *     tags={"Product Variations"},
+     *     security={{ "bearerAuth": {} }},
      *     @OA\Parameter(
      *         name="sort",
      *         in="query",
@@ -175,6 +176,7 @@ class ProductVariationController extends Controller
      *     path="/api/enjoy/products/variants/create",
      *     summary="Create a new product variation",
      *     tags={"Product Variations"},
+     *     security={{ "bearerAuth": {} }},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -325,6 +327,7 @@ class ProductVariationController extends Controller
      *     path="/api/enjoy/products/variants/{id}",
      *     summary="Get details of a product variation",
      *     tags={"Product Variations"},
+     *     security={{ "bearerAuth": {} }},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -436,6 +439,7 @@ class ProductVariationController extends Controller
      *     path="/api/enjoy/products/variants/{id}",
      *     summary="Update a product variation",
      *     tags={"Product Variations"},
+     *     security={{ "bearerAuth": {} }},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -614,6 +618,7 @@ class ProductVariationController extends Controller
      *     path="/api/enjoy/products/variants/{id}",
      *     summary="Delete a product variation",
      *     tags={"Product Variations"},
+     *     security={{ "bearerAuth": {} }},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",

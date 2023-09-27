@@ -27,6 +27,7 @@ class ProductController extends Controller
      *     path="/api/enjoy/products",
      *     operationId="getProducts",
      *     tags={"Products"},
+     *     security={{ "bearerAuth": {} }},
      *     summary="Get a list of products",
      *     description="Retrieve a list of products with optional sorting, pagination, and filtering.",
      *     @OA\Parameter(
@@ -311,6 +312,7 @@ class ProductController extends Controller
      *     path="/api/enjoy/products/show/{id}",
      *     summary="Get product details by ID",
      *     tags={"Products"},
+     *     security={{ "bearerAuth": {} }},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -595,6 +597,7 @@ class ProductController extends Controller
      *     path="/enjoy/products/sold/{id}",
      *     operationId="getSoldProducts",
      *     tags={"Products"},
+     *     security={{ "bearerAuth": {} }},
      *     summary="Get sold products by ID",
      *     description="Get sold products details by providing product ID.",
      *     @OA\Parameter(
