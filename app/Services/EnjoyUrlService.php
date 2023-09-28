@@ -17,7 +17,7 @@ class EnjoyUrlService
      *
      * @return string The base HTTP URL.
      */
-    public function getHttpUrl(): string
+    public function getHttpUrl()
     {
         return env('APP_ENV') === 'local' || env('APP_DEBUG') === true
             ? str_replace('https', 'http', env('ENJOY_URL_HOMOLOGATION'))
@@ -29,7 +29,7 @@ class EnjoyUrlService
      *
      * @return string The base HTTPS URL.
      */
-    public function getHttpsUrl(): string
+    public function getHttpsUrl()
     {
         return env('APP_ENV') === 'local' || env('APP_DEBUG') === true
             ? env('ENJOY_URL_HOMOLOGATION')
