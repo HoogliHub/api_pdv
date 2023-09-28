@@ -18,7 +18,7 @@ class CustomerController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/enjoy/customers",
+     *     path="/api/customers",
      *     operationId="getCustomers",
      *     summary="Get a list of customers",
      *     tags={"Customers"},
@@ -194,7 +194,7 @@ class CustomerController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/enjoy/customers/create",
+     *     path="/api/customers/create",
      *     summary="Create a new user",
      *     description="Creates a new user and associates addresses with it.",
      *     tags={"Customers"},
@@ -358,7 +358,7 @@ class CustomerController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/enjoy/customers/show/{id}",
+     *     path="/api/customers/{id}",
      *     summary="Retrieve customer details by ID",
      *     tags={"Customers"},
      *     security={{ "bearerAuth": {} }},
@@ -492,7 +492,7 @@ class CustomerController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/api/enjoy/customers/update/{id}",
+     *     path="/api/customers/{id}",
      *     summary="Update a user",
      *     description="Updates a user and associated addresses.",
      *     tags={"Customers"},
@@ -713,7 +713,7 @@ class CustomerController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/api/enjoy/customers/delete/{id}",
+     *     path="/api/customers/{id}",
      *     tags={"Customers"},
      *     security={{ "bearerAuth": {} }},
      *     summary="Delete a customer and associated addresses by ID.",
@@ -808,7 +808,7 @@ class CustomerController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/enjoy/customers/address",
+     *     path="/api/customers/addresses",
      *     summary="Get a list of addresses",
      *     description="Retrieve a list of addresses with optional sorting and pagination.",
      *     tags={"Customers"},
@@ -958,7 +958,7 @@ class CustomerController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/enjoy/customers/address/show/{id}",
+     *     path="/api/customers/addresses/{id}",
      *     summary="Get a specific address",
      *     description="Retrieve a specific address by its ID.",
      *     tags={"Customers"},

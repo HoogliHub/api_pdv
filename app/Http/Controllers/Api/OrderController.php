@@ -21,7 +21,7 @@ class OrderController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/enjoy/orders",
+     *     path="/api/orders",
      *     operationId="getOrders",
      *     tags={"Orders"},
      *     security={{ "bearerAuth": {} }},
@@ -216,7 +216,7 @@ class OrderController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/enjoy/orders/show/{id}",
+     *     path="/api/orders/{id}",
      *     summary="Retrieve order details by ID",
      *     tags={"Orders"},
      *     security={{ "bearerAuth": {} }},
@@ -377,7 +377,7 @@ class OrderController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/enjoy/orders/show/{order}/complete",
+     *     path="/api/orders/{id}/complete",
      *     summary="Retrieve detailed order information by ID",
      *     tags={"Orders"},
      *     security={{ "bearerAuth": {} }},

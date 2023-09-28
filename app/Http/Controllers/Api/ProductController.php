@@ -24,7 +24,7 @@ class ProductController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/enjoy/products",
+     *     path="/api/products",
      *     operationId="getProducts",
      *     tags={"Products"},
      *     security={{ "bearerAuth": {} }},
@@ -309,7 +309,7 @@ class ProductController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/enjoy/products/show/{id}",
+     *     path="/api/products/{id}",
      *     summary="Get product details by ID",
      *     tags={"Products"},
      *     security={{ "bearerAuth": {} }},
@@ -423,7 +423,6 @@ class ProductController extends Controller
      *     )
      * )
      */
-
     public function show(string $id): JsonResponse
     {
         if (is_numeric(trim($id))) {
@@ -594,7 +593,7 @@ class ProductController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/enjoy/products/sold/{id}",
+     *     path="/api/products/{id}/sold",
      *     operationId="getSoldProducts",
      *     tags={"Products"},
      *     security={{ "bearerAuth": {} }},

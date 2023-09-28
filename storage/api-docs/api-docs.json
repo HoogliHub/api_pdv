@@ -13,13 +13,13 @@
         "version": "1.0.0"
     },
     "paths": {
-        "/api/enjoy/categories": {
+        "/api/categories": {
             "get": {
                 "tags": [
                     "Categories"
                 ],
                 "summary": "Get a list of categories",
-                "operationId": "908868ce2f43c7d9361fca670a9a5fff",
+                "operationId": "ac9c4d978ea4e5b72915ca9728e5b8b1",
                 "parameters": [
                     {
                         "name": "sort",
@@ -195,13 +195,13 @@
                 ]
             }
         },
-        "/api/enjoy/categories/create": {
+        "/api/categories/create": {
             "post": {
                 "tags": [
                     "Categories"
                 ],
                 "summary": "Create a new category",
-                "operationId": "85a6b8a7beb15c0145026b549f071038",
+                "operationId": "fe5c6d640745d7c9fa33093febcb7388",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -328,13 +328,13 @@
                 ]
             }
         },
-        "/api/enjoy/categories/show/{id}": {
+        "/api/categories/{id}": {
             "get": {
                 "tags": [
                     "Categories"
                 ],
                 "summary": "Get information about a specific category",
-                "operationId": "d385c9369670f85bc5ef528e5a0e5932",
+                "operationId": "09767bb2e47dde77dd1e2591428b0ae1",
                 "parameters": [
                     {
                         "name": "id",
@@ -477,15 +477,276 @@
                         "bearerAuth": []
                     }
                 ]
+            },
+            "put": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Update a category",
+                "operationId": "7dcf71887e585de7f881e9eb98d86126",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the category",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "Category": {
+                                        "properties": {
+                                            "is_featured": {
+                                                "type": "boolean"
+                                            },
+                                            "metatag": {
+                                                "type": "array",
+                                                "items": {
+                                                    "properties": {
+                                                        "description": {
+                                                            "type": "string"
+                                                        },
+                                                        "title": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "parent_id": {
+                                                "type": "integer"
+                                            },
+                                            "slug": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Category updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "status": {
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "category_id": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Delete a category",
+                "operationId": "9b61b65823f4a21f182506b34ddf805c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the category",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
-        "/api/enjoy/categories/show/tree/{id}": {
+        "/api/categories/{id}/tree": {
             "get": {
                 "tags": [
                     "Categories"
                 ],
                 "summary": "Show a category tree",
-                "operationId": "6a06d2c421c1416c17850de736696792",
+                "operationId": "a844beddbb3ba9f0560829575edb9a51",
                 "parameters": [
                     {
                         "name": "id",
@@ -704,272 +965,7 @@
                 ]
             }
         },
-        "/api/enjoy/categories/update/{id}": {
-            "put": {
-                "tags": [
-                    "Categories"
-                ],
-                "summary": "Update a category",
-                "operationId": "321297e770dd0e13185275d5461160e1",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID of the category",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "Category": {
-                                        "properties": {
-                                            "is_featured": {
-                                                "type": "boolean"
-                                            },
-                                            "metatag": {
-                                                "type": "array",
-                                                "items": {
-                                                    "properties": {
-                                                        "description": {
-                                                            "type": "string"
-                                                        },
-                                                        "title": {
-                                                            "type": "string"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                }
-                                            },
-                                            "name": {
-                                                "type": "string"
-                                            },
-                                            "parent_id": {
-                                                "type": "integer"
-                                            },
-                                            "slug": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "type": "object"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Category updated successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean"
-                                        },
-                                        "code": {
-                                            "type": "integer"
-                                        },
-                                        "status": {
-                                            "type": "boolean"
-                                        },
-                                        "message": {
-                                            "type": "string"
-                                        },
-                                        "category_id": {
-                                            "type": "integer"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Category not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean"
-                                        },
-                                        "status": {
-                                            "type": "integer"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        },
-                                        "message": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Validation error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean"
-                                        },
-                                        "status": {
-                                            "type": "integer"
-                                        },
-                                        "message": {
-                                            "type": "string"
-                                        },
-                                        "errors": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean"
-                                        },
-                                        "status": {
-                                            "type": "integer"
-                                        },
-                                        "message": {
-                                            "type": "string"
-                                        },
-                                        "error": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/enjoy/categories/delete/{id}": {
-            "delete": {
-                "tags": [
-                    "Categories"
-                ],
-                "summary": "Delete a category",
-                "operationId": "8a30261ac93e418c26a37978ec401d9a",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID of the category",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Category deleted successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean"
-                                        },
-                                        "status": {
-                                            "type": "integer"
-                                        },
-                                        "message": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Category not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean"
-                                        },
-                                        "status": {
-                                            "type": "integer"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        },
-                                        "message": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Validation error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean"
-                                        },
-                                        "status": {
-                                            "type": "integer"
-                                        },
-                                        "message": {
-                                            "type": "string"
-                                        },
-                                        "errors": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/enjoy/customers": {
+        "/api/customers": {
             "get": {
                 "tags": [
                     "Customers"
@@ -1212,14 +1208,14 @@
                 ]
             }
         },
-        "/api/enjoy/customers/create": {
+        "/api/customers/create": {
             "post": {
                 "tags": [
                     "Customers"
                 ],
                 "summary": "Create a new user",
                 "description": "Creates a new user and associates addresses with it.",
-                "operationId": "3b741e88161cfcf8b5bd48beb6352f93",
+                "operationId": "aad5d08496db69024cac824301ca86bd",
                 "requestBody": {
                     "description": "User data and addresses",
                     "required": true,
@@ -1407,13 +1403,13 @@
                 ]
             }
         },
-        "/api/enjoy/customers/show/{id}": {
+        "/api/customers/{id}": {
             "get": {
                 "tags": [
                     "Customers"
                 ],
                 "summary": "Retrieve customer details by ID",
-                "operationId": "cfc9228a6b8222667537f74acf139c3e",
+                "operationId": "d03d1278b7e26322e9a425406bc4e9f2",
                 "parameters": [
                     {
                         "name": "id",
@@ -1595,16 +1591,14 @@
                         "bearerAuth": []
                     }
                 ]
-            }
-        },
-        "/api/enjoy/customers/update/{id}": {
+            },
             "put": {
                 "tags": [
                     "Customers"
                 ],
                 "summary": "Update a user",
                 "description": "Updates a user and associated addresses.",
-                "operationId": "a4a13de3e12603ceb953f7dd754066e6",
+                "operationId": "32da1527afa82d1a6b0e034146f1032d",
                 "parameters": [
                     {
                         "name": "id",
@@ -1818,9 +1812,7 @@
                         "bearerAuth": []
                     }
                 ]
-            }
-        },
-        "/api/enjoy/customers/delete/{id}": {
+            },
             "delete": {
                 "tags": [
                     "Customers"
@@ -1925,14 +1917,14 @@
                 ]
             }
         },
-        "/api/enjoy/customers/address": {
+        "/api/customers/addresses": {
             "get": {
                 "tags": [
                     "Customers"
                 ],
                 "summary": "Get a list of addresses",
                 "description": "Retrieve a list of addresses with optional sorting and pagination.",
-                "operationId": "6521cb528273c287df22bf0cc1766689",
+                "operationId": "85d82d6b0525f19464868a9725b061c2",
                 "parameters": [
                     {
                         "name": "sort",
@@ -2139,14 +2131,14 @@
                 ]
             }
         },
-        "/api/enjoy/customers/address/show/{id}": {
+        "/api/customers/addresses/{id}": {
             "get": {
                 "tags": [
                     "Customers"
                 ],
                 "summary": "Get a specific address",
                 "description": "Retrieve a specific address by its ID.",
-                "operationId": "b4b7b62a7308243f6cee59f2ae1648ea",
+                "operationId": "29002c66f42a38c9db3416cfc62b768e",
                 "parameters": [
                     {
                         "name": "id",
@@ -2297,7 +2289,7 @@
                 ]
             }
         },
-        "/api/enjoy/orders": {
+        "/api/orders": {
             "get": {
                 "tags": [
                     "Orders"
@@ -2577,13 +2569,13 @@
                 ]
             }
         },
-        "/api/enjoy/orders/show/{id}": {
+        "/api/orders/{id}": {
             "get": {
                 "tags": [
                     "Orders"
                 ],
                 "summary": "Retrieve order details by ID",
-                "operationId": "bc0127d466f913c0c889e08cce0a7e4c",
+                "operationId": "88d27387b1e409e075c18609d4a0c300",
                 "parameters": [
                     {
                         "name": "id",
@@ -2775,13 +2767,13 @@
                 ]
             }
         },
-        "/api/enjoy/orders/show/{order}/complete": {
+        "/api/orders/{id}/complete": {
             "get": {
                 "tags": [
                     "Orders"
                 ],
                 "summary": "Retrieve detailed order information by ID",
-                "operationId": "1c050077f3fa11a2ab72ceba11469311",
+                "operationId": "f601c50c366828f02c1e033aeb59ce1e",
                 "parameters": [
                     {
                         "name": "id",
@@ -3144,7 +3136,7 @@
                 ]
             }
         },
-        "/api/enjoy/products": {
+        "/api/products": {
             "get": {
                 "tags": [
                     "Products"
@@ -3462,13 +3454,13 @@
                 ]
             }
         },
-        "/api/enjoy/products/show/{id}": {
+        "/api/products/{id}": {
             "get": {
                 "tags": [
                     "Products"
                 ],
                 "summary": "Get product details by ID",
-                "operationId": "627cc54685dff64b6c323ac6f3b17f11",
+                "operationId": "c87fb2e4d617e7b36c712cad358acdb8",
                 "parameters": [
                     {
                         "name": "id",
@@ -3784,7 +3776,7 @@
                 ]
             }
         },
-        "/enjoy/products/sold/{id}": {
+        "/api/products/{id}/sold": {
             "get": {
                 "tags": [
                     "Products"
@@ -3915,13 +3907,13 @@
                 ]
             }
         },
-        "/api/enjoy/products/variants": {
+        "/api/products/variants": {
             "get": {
                 "tags": [
                     "Product Variations"
                 ],
                 "summary": "Get a list of product variations",
-                "operationId": "1ab62e6e84522021c8c56ec0b56e0ca6",
+                "operationId": "c55e4e73559deb76f78f71f32c97e665",
                 "parameters": [
                     {
                         "name": "sort",
@@ -4098,13 +4090,13 @@
                 ]
             }
         },
-        "/api/enjoy/products/variants/create": {
+        "/api/products/variants/create": {
             "post": {
                 "tags": [
                     "Product Variations"
                 ],
                 "summary": "Create a new product variation",
-                "operationId": "f71f85890e29b23f1a5c9cbe18751f63",
+                "operationId": "aabce8eba3ecd93ed6750577151863e9",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -4242,13 +4234,13 @@
                 ]
             }
         },
-        "/api/enjoy/products/variants/{id}": {
+        "/api/products/variants/{id}": {
             "get": {
                 "tags": [
                     "Product Variations"
                 ],
                 "summary": "Get details of a product variation",
-                "operationId": "3249d201192b4cc80bf529970ba9dd1c",
+                "operationId": "76afefdee55ec38bbcc7803f10a5f2c9",
                 "parameters": [
                     {
                         "name": "id",
@@ -4385,7 +4377,7 @@
                     "Product Variations"
                 ],
                 "summary": "Update a product variation",
-                "operationId": "378c5933008d33ef25cedd8ac6c92b01",
+                "operationId": "4a81d6c175ef29d07e6fed69af3e7878",
                 "parameters": [
                     {
                         "name": "id",
@@ -4567,7 +4559,7 @@
                     "Product Variations"
                 ],
                 "summary": "Delete a product variation",
-                "operationId": "11ac4c5da67d453a39ab78dee3d2dc1d",
+                "operationId": "fe8368d5eab7f4a68ae6507c16df70a3",
                 "parameters": [
                     {
                         "name": "id",
