@@ -63,6 +63,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{category}', 'update')->name('update');
         Route::delete('/{category}', 'destroy')->name('delete');
     });
+    //Coupon
+    Route::controller('App\Http\Controllers\Api\CouponController')->prefix('coupons')->name('coupons.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/{coupon}', 'show')->name('show');
+        Route::get('/{coupon}/products', 'show_products')->name('show.products');
+        Route::post('/create', 'store')->name('create');
+        Route::put('/{coupon}', 'update')->name('update');
+        Route::delete('/{coupon}', 'destroy')->name('delete');
+    });
+
     //User
     Route::controller('App\Http\Controllers\Api\AuthController')->group(function () {
         Route::get('/auth/logout', 'logout')->name('logout');

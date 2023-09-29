@@ -765,7 +765,6 @@ class CategoryController extends Controller
 
             $category = DB::connection('enjoy')->table('categories as c')
                 ->select('c.*')
-                ->selectRaw('exists(select * from products p where p.category_id = c.id) as has_product')
                 ->where('c.id', '=', $id)
                 ->first();
 
