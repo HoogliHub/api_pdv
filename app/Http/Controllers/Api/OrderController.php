@@ -699,9 +699,112 @@ class OrderController extends Controller
         //
     }
 
-    //TODO
-    public function destroy(string $id)
+
+    /**
+     * @OA\Delete(
+     *     path="/api/orders/{id}",
+     *     tags={"Orders"},
+     *     security={{ "bearerAuth": {} }},
+     *     summary="Delete an order by ID",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID of the order to be deleted",
+     *         required=true,
+     *         @OA\Schema(type="integer", format="int64"),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Order deleted successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="status", type="integer", example=204),
+     *             @OA\Property(property="message", type="string", example="Order deleted successfully"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No data found for the given ID",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="status", type="integer", example=404),
+     *             @OA\Property(property="data", type="object"),
+     *             @OA\Property(property="message", type="string", example="There is no data for the given ID."),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid parameter",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="status", type="integer", example=400),
+     *             @OA\Property(property="data", type="object"),
+     *             @OA\Property(property="message", type="string", example="The :id parameter must be of integer type."),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="status", type="integer", example=500),
+     *             @OA\Property(property="data", type="object"),
+     *             @OA\Property(property="message", type="string", example="Internal server error"),
+     *             @OA\Property(property="error", type="string", example="Error message.")
+     *         )
+     *     )
+     * )
+     */
+    public function destroy(string $id): JsonResponse
     {
-        //
+        if (is_numeric(trim($id))) {
+            $order = DB::connection('enjoy')->table('orders as o')
+                ->where('o.id', '=', $id)
+                ->first();
+
+            if ($order) {
+                $order_details = DB::connection('enjoy')->table('order_details as od')
+                    ->where('od.order_id', '=', $id)
+                    ->get();
+
+                $combined_orders = DB::connection('enjoy')->table('combined_orders as co')
+                    ->where('co.id', '=', $order->combined_order_id)
+                    ->get();
+
+                if ($order_details->all()) {
+                    $order_details = DB::connection('enjoy')->table('order_details as od')
+                        ->where('od.order_id', '=', $id)
+                        ->delete();
+                }
+
+                if ($combined_orders->all()) {
+                    $combined_orders = DB::connection('enjoy')->table('combined_orders as co')
+                        ->where('co.id', '=', $order->combined_order_id)
+                        ->delete();
+                }
+
+                DB::connection('enjoy')->table('orders')->where('id', '=', $id)->delete();
+
+                return response()->json([
+                    'success' => true,
+                    'status' => 204,
+                    'message' => 'Order deleted successfully'
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => true,
+                    'status' => 404,
+                    'data' => [],
+                    'message' => 'There is no data for the given ID.'
+                ], 404);
+            }
+        } else {
+            return response()->json([
+                'success' => false,
+                'status' => 400,
+                'data' => [],
+                'message' => 'The :id parameter must be of integer type.'
+            ], 400);
+        }
     }
 }

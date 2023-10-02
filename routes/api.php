@@ -36,12 +36,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/{product}', 'show')->name('show');
         Route::get('/{product}/sold', 'sold')->name('sold');
+        Route::delete('/{product}', 'destroy')->name('delete');
     });
     //Orders
     Route::controller('App\Http\Controllers\Api\OrderController')->prefix('orders')->name('orders.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/{order}', 'show')->name('show');
         Route::get('/{order}/complete', 'show_details')->name('show.details');
+        Route::delete('/{order}', 'destroy')->name('delete');
     });
     //Clients
     Route::controller('App\Http\Controllers\Api\CustomerController')->prefix('customers')->name('customers.')->group(function () {

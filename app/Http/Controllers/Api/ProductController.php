@@ -585,10 +585,103 @@ class ProductController extends Controller
         //
     }
 
-    //TODO: Exclusão de Produtos
-    public function destroy(string $id)
+
+    /**
+     * @OA\Delete(
+     *     path="/api/products/{id}",
+     *     tags={"Products"},
+     *     security={{ "bearerAuth": {} }},
+     *     summary="Delete a product by ID",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID of the product to be deleted",
+     *         required=true,
+     *         @OA\Schema(type="integer", format="int64"),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Product deleted successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="status", type="integer", example=204),
+     *             @OA\Property(property="message", type="string", example="Product deleted successfully"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No data found for the given ID",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="status", type="integer", example=404),
+     *             @OA\Property(property="data", type="object"),
+     *             @OA\Property(property="message", type="string", example="There is no data for the given ID."),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid parameter",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="status", type="integer", example=400),
+     *             @OA\Property(property="data", type="object"),
+     *             @OA\Property(property="message", type="string", example="The :id parameter must be of integer type."),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="status", type="integer", example=500),
+     *             @OA\Property(property="data", type="object"),
+     *             @OA\Property(property="message", type="string", example="Internal server error"),
+     *             @OA\Property(property="error", type="string", example="Error message.")
+     *         )
+     *     )
+     * )
+     */
+    public function destroy(string $id): JsonResponse
     {
-        //
+        if (is_numeric(trim($id))) {
+            $product = DB::connection('enjoy')->table('products as p')
+                ->where('p.id', '=', $id)
+                ->first();
+
+            if ($product) {
+                $product_variation = DB::connection('enjoy')->table('product_stocks as ps')
+                    ->where('ps.product_id', '=', $id)
+                    ->get();
+
+                if ($product_variation->all()) {
+                    $product_variation = DB::connection('enjoy')->table('product_stocks as ps')
+                        ->where('ps.product_id', '=', $id)
+                        ->delete();
+                }
+
+                DB::connection('enjoy')->table('products')->where('id', '=', $id)->delete();
+
+                return response()->json([
+                    'success' => true,
+                    'status' => 204,
+                    'message' => 'Product deleted successfully'
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => true,
+                    'status' => 404,
+                    'data' => [],
+                    'message' => 'There is no data for the given ID.'
+                ], 404);
+            }
+        } else {
+            return response()->json([
+                'success' => false,
+                'status' => 400,
+                'data' => [],
+                'message' => 'The :id parameter must be of integer type.'
+            ], 400);
+        }
     }
 
     /**
