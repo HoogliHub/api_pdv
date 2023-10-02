@@ -520,7 +520,7 @@ class ProductController extends Controller
                 $insert_product_data['low_stock_quantity'] = $request->input('Product.low_stock_quantity');
             }
 
-            if ($request->has('Product.discount')) {
+            if ($request->input('Product.is_discounted') && $request->has('Product.discount')) {
                 $insert_product_data['discount_type'] = $request->input('Product.discount.type');
                 $insert_product_data['discount'] = $request->input('Product.discount.value');
                 $insert_product_data['discount_start_date'] = strtotime($request->input('Product.discount.discount_start_date'));
@@ -846,10 +846,356 @@ class ProductController extends Controller
         }
     }
 
-    //TODO: Atualizar Dados do Produto
-    public function update(Request $request, string $id)
+
+    /**
+     * @OA\Put(
+     *      path="/api/products/{id}",
+     *      operationId="updateProduct",
+     *      tags={"Products"},
+     *      security={{ "bearerAuth": {} }},
+     *      summary="Update a product",
+     *      description="Updates an existing product",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Product ID",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="string"
+     *          )
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          description="Product data",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="Product", type="object",
+     *                  @OA\Property(property="name", type="string"),
+     *                  @OA\Property(property="category_id", type="integer"),
+     *                  @OA\Property(property="unit", type="string", enum={"pc", "un"}),
+     *                  @OA\Property(property="weight", type="integer", minimum=0),
+     *                  @OA\Property(property="min_qty", type="integer", minimum=1),
+     *                  @OA\Property(property="tags", type="array", @OA\Items(type="string")),
+     *                  @OA\Property(property="barcode", type="string"),
+     *                  @OA\Property(property="is_refundable", type="boolean"),
+     *                  @OA\Property(property="images", type="array",
+     *                      @OA\Items(type="object",
+     *                          @OA\Property(property="gallery", type="array", @OA\Items(type="string", format="url")),
+     *                          @OA\Property(property="miniature", type="string", format="url")
+     *                      )
+     *                  ),
+     *                  @OA\Property(property="video", type="object",
+     *                      @OA\Property(property="provider", type="string", enum={"youtube", "vimeo"}),
+     *                      @OA\Property(property="link", type="string", format="url")
+     *                  ),
+     *                  @OA\Property(property="unit_price", type="number", format="float"),
+     *                  @OA\Property(property="is_discounted", type="boolean"),
+     *                  @OA\Property(property="discount", type="object",
+     *                      @OA\Property(property="type", type="string", enum={"amount", "percent"}),
+     *                      @OA\Property(property="value", type="number", format="float", minimum=1, maximum=100),
+     *                      @OA\Property(property="discount_start_date", type="string", format="date", example="Y-m-d"),
+     *                      @OA\Property(property="discount_end_date", type="string", format="date", example="Y-m-d")
+     *                  ),
+     *                  @OA\Property(property="current_stock", type="integer", minimum=1),
+     *                  @OA\Property(property="description", type="string"),
+     *                  @OA\Property(property="metatag", type="object",
+     *                      @OA\Property(property="title", type="string"),
+     *                      @OA\Property(property="description", type="string"),
+     *                      @OA\Property(property="image", type="string", format="url")
+     *                  ),
+     *                  @OA\Property(property="low_stock_quantity", type="integer", minimum=1),
+     *                  @OA\Property(property="is_featured", type="boolean"),
+     *                  @OA\Property(property="is_todays_deal", type="boolean"),
+     *                  @OA\Property(property="published", type="boolean"),
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Product updated successfully",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="code", type="integer", example=201),
+     *              @OA\Property(property="status", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Product Updated Successfully"),
+     *              @OA\Property(property="product_id", type="integer", example=123)
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Product not found",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="status", type="integer", example=404),
+     *              @OA\Property(property="data", type="object", example={}),
+     *              @OA\Property(property="message", type="string", example="There is no data for the given ID.")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal server error",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="status", type="integer", example=500),
+     *              @OA\Property(property="message", type="string", example="Internal server error"),
+     *              @OA\Property(property="error", type="string", example="Error message")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Invalid ID",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="status", type="integer", example=400),
+     *              @OA\Property(property="data", type="object", example={}),
+     *              @OA\Property(property="message", type="string", example="The :id parameter must be of integer type.")
+     *          )
+     *      )
+     * )
+     */
+    public function update(Request $request, string $id): JsonResponse
     {
-        //
+        if (is_numeric(trim($id))) {
+            $validator = Validator::make($request->input('Product'), [
+                'name' => 'string',
+                'category_id' => 'integer|min:1',
+                'unit' => 'string|in:pc,un',
+                'weight' => 'integer|min:0',
+                'min_qty' => 'integer|min:1',
+                'tags' => 'array',
+                'barcode' => 'string',
+                'is_refundable' => 'boolean',
+                'images' => 'array|valid_keys:gallery,miniature',
+                'images.miniature' => 'url:http,https',
+                'images.gallery' => 'array|min:1',
+                'images.gallery.*' => 'url:http,https',
+                'video' => 'array|valid_keys:provider,link',
+                'video.provider' => 'string|in:youtube,vimeo',
+                'video.link' => 'url:http,https',
+                'unit_price' => 'decimal:2',
+                'is_discounted' => 'boolean',
+                'discount' => [
+                    'array',
+                    'valid_keys:type,value,discount_start_date,discount_end_date',
+                    Rule::requiredIf($request->has('Product.is_discounted') == true)
+                ],
+                'discount.type' => 'string|in:amount,percent',
+                'discount.value' => ($request->input('Product.discount.type') == 'amount' ? 'decimal:2|min:1' : 'integer|min:1|max:100'),
+                'discount.discount_start_date' => 'date_format:Y-m-d|after_or_equal:' . date('Y-m-d'),
+                'discount.discount_end_date' => 'date_format:Y-m-d|after_or_equal:discount.discount_start_date',
+                'current_stock' => 'integer|min:1',
+                'description' => 'string',
+                'metatag' => 'array|valid_keys:title,description,image',
+                'metatag.title' => 'string',
+                'metatag.description' => 'string',
+                'metatag.image' => 'url:http,https',
+                'low_stock_quantity' => 'integer|min:1',
+                'is_featured' => 'boolean',
+                'is_todays_deal' => 'boolean',
+                'published' => 'boolean',
+            ], [
+                'unit.in' => 'The :attribute field must be one of the following values: PC or UN',
+                'video.provider.in' => 'The :attribute field must be one of the following values: Youtube or Vimeo',
+                'discount.type.in' => 'The :attribute field must be one of the following values: Amount or Percent'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'status' => 400,
+                    'message' => 'Validation error',
+                    'errors' => $validator->errors()
+                ], 400);
+            }
+
+            $category = DB::connection('enjoy')->table('categories as c')
+                ->where('c.id', '=', $request->input('Product.category_id'))
+                ->first();
+
+            if (!$category) {
+                return response()->json([
+                    'success' => false,
+                    'status' => 400,
+                    'message' => 'Validation error',
+                    'errors' => [
+                        'category_id' => [
+                            'The specified category_id does not exist'
+                        ]
+                    ]
+                ], 400);
+            }
+
+            try {
+                DB::beginTransaction();
+
+                $product = DB::connection('enjoy')->table('products as p')
+                    ->where('p.id', '=', $id);
+
+                $user = DB::connection('enjoy')->table('users')->where('email', 'LIKE', '%' . $request->user()->email . '%')->first();
+
+                $user_admin = DB::connection('enjoy')->table('users')->where('user_type', 'LIKE', '%' . 'admin' . '%')->first();
+
+                $existing_images = $product->first()->photos . ',' . $product->first()->thumbnail_img;
+
+                if ($product) {
+                    $update_category_data = [
+                        'updated_at' => now()
+                    ];
+
+                    if ($request->has('Product.name')) {
+                        $update_category_data['name'] = $request->input('Product.name');
+                    }
+                    if ($request->has('Product.category_id')) {
+                        $update_category_data['category_id'] = $request->input('Product.category_id');
+                    }
+                    if ($request->has('Product.unit')) {
+                        $update_category_data['unit'] = $request->input('Product.unit');
+                    }
+                    if ($request->has('Product.weight')) {
+                        $update_category_data['weight'] = $request->input('Product.weight');
+                    }
+                    if ($request->has('Product.min_qty')) {
+                        $update_category_data['min_qty'] = $request->input('Product.min_qty');
+                    }
+                    if ($request->has('Product.tags')) {
+                        $update_category_data['tags'] = implode(',', $request->input('Product.tags'));
+                    }
+                    if ($request->has('Product.barcode')) {
+                        $update_category_data['barcode'] = $request->input('Product.barcode');
+                    }
+                    if ($request->has('Product.is_refundable')) {
+                        $update_category_data['refundable'] = $request->input('Product.is_refundable') ? 1 : 0;
+                    }
+                    if ($request->has('Product.images')) {
+                        if (!empty($existing_images)) {
+                            foreach (explode(',', $existing_images) as $image) {
+                                DB::connection('enjoy')->table('uploads')->delete($image);
+                            }
+                        }
+
+                        $photos = [];
+
+                        if ($request->has('Product.images.gallery')) {
+                            foreach ($request->input('Product.images.gallery') as $image) {
+                                $image_id = DB::connection('enjoy')->table('uploads')->insertGetId([
+                                    'user_id' => $user->id ?? $user_admin->id,
+                                    'type' => 'image',
+                                    'external_link' => $image
+                                ]);
+                                $photos[] = $image_id;
+                            }
+                        }
+
+                        if ($request->has('Product.images.miniature')) {
+                            $image_id = DB::connection('enjoy')->table('uploads')->insertGetId([
+                                'user_id' => $user->id ?? $user_admin->id,
+                                'type' => 'image',
+                                'external_link' => $request->input('Product.images.miniature')
+                            ]);
+                            $update_category_data['thumbnail_img'] = $image_id;
+                        }
+
+                        if (!empty($photos)) {
+                            $update_category_data['photos'] = implode(',', $photos);
+                        }
+                    }
+
+                    if ($request->has('Product.video')) {
+                        if ($request->has('Product.video.provider')) {
+                            $update_category_data['video_provider'] = $request->input('Product.video.provider');
+                        }
+                        if ($request->has('Product.video.link')) {
+                            $update_category_data['video_link'] = $request->input('Product.video.link');
+                        }
+                    }
+
+                    if ($request->has('Product.unit_price')) {
+                        $update_category_data['unit_price'] = (float)$request->input('Product.unit_price');
+                    }
+
+                    if ($request->input('Product.is_discounted') && $request->has('Product.discount')) {
+                        $update_category_data['discount_type'] = $request->input('Product.discount.type');
+                        $update_category_data['discount'] = $request->input('Product.discount.value');
+                        $update_category_data['discount_start_date'] = strtotime($request->input('Product.discount.discount_start_date'));
+                        $update_category_data['discount_end_date'] = strtotime($request->input('Product.discount.discount_end_date'));
+                    }
+
+                    if ($request->has('Product.metatag')) {
+                        if ($request->has('Product.metatag.title')) {
+                            $update_category_data['meta_title'] = $request->input('Product.metatag.title');
+                        }
+                        if ($request->has('Product.metatag.description')) {
+                            $update_category_data['meta_description'] = $request->input('Product.metatag.description');
+                        }
+                        if ($request->has('Product.metatag.image')) {
+                            if ($product->first()->meta_img) {
+                                DB::connection('enjoy')->table('uploads')->delete($product->first()->meta_img);
+                            }
+                            $meta_image_id = DB::connection('enjoy')->table('uploads')->insertGetId([
+                                'user_id' => $user->id ?? $user_admin->id,
+                                'type' => 'image',
+                                'external_link' => $request->input('Product.metatag.image')
+                            ]);
+                            $update_category_data['meta_img'] = $meta_image_id;
+                        }
+                    }
+
+                    if ($request->has('Product.description')) {
+                        $update_category_data['description'] = $request->input('Product.description');
+                    }
+
+                    if ($request->has('Product.current_stock')) {
+                        $update_category_data['current_stock'] = (integer)$request->input('Product.current_stock');
+                    }
+
+                    if ($request->has('Product.low_stock_quantity')) {
+                        $update_category_data['low_stock_quantity'] = $request->input('Product.low_stock_quantity');
+                    }
+                    if ($request->has('Product.is_featured')) {
+                        $update_category_data['featured'] = $request->input('Product.is_featured') ? 1 : 0;
+                    }
+                    if ($request->has('Product.is_todays_deal')) {
+                        $update_category_data['todays_deal'] = $request->input('Product.is_todays_deal') ? 1 : 0;
+                    }
+                    if ($request->has('Product.published')) {
+                        $update_category_data['published'] = $request->input('Product.published') ? 1 : 0;
+                    }
+
+                    $product->update($update_category_data);
+
+                    DB::commit();
+
+                    return response()->json([
+                        'success' => true,
+                        'code' => 201,
+                        'status' => true,
+                        'message' => 'Product Updated Successfully',
+                        'product_id' => $product->first()->id
+                    ], 201);
+                } else {
+                    return response()->json([
+                        'success' => true,
+                        'status' => 404,
+                        'data' => [],
+                        'message' => 'There is no data for the given ID.'
+                    ], 404);
+                }
+            } catch (Throwable $th) {
+                DB::rollback();
+                return response()->json([
+                    'success' => false,
+                    'status' => 500,
+                    'message' => 'Internal server error',
+                    'error' => $th->getMessage()
+                ], 500);
+            }
+        } else {
+            return response()->json([
+                'success' => false,
+                'status' => 400,
+                'data' => [],
+                'message' => 'The :id parameter must be of integer type.'
+            ], 400);
+        }
     }
 
 
