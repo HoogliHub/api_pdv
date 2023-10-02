@@ -4923,6 +4923,296 @@
                 ]
             }
         },
+        "/api/products/create": {
+            "post": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Create a new product",
+                "operationId": "079bf205e7c6b03dfe1b79692bd2f317",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Nome do Produto"
+                                    },
+                                    "category_id": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "example": 1
+                                    },
+                                    "unit": {
+                                        "type": "string",
+                                        "enum": [
+                                            "pc",
+                                            "un"
+                                        ],
+                                        "example": "pc"
+                                    },
+                                    "weight": {
+                                        "type": "integer",
+                                        "format": "int32",
+                                        "example": 500
+                                    },
+                                    "min_qty": {
+                                        "type": "integer",
+                                        "format": "int32",
+                                        "example": 10
+                                    },
+                                    "tags": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "tag1",
+                                            "tag2"
+                                        ]
+                                    },
+                                    "barcode": {
+                                        "type": "string",
+                                        "example": "123456789"
+                                    },
+                                    "is_refundable": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "images": {
+                                        "properties": {
+                                            "gallery": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string",
+                                                    "format": "uri"
+                                                },
+                                                "example": [
+                                                    "http://example.com/image1.jpg",
+                                                    "http://example.com/image2.jpg"
+                                                ]
+                                            },
+                                            "miniature": {
+                                                "type": "string",
+                                                "format": "uri",
+                                                "example": "http://example.com/miniature.jpg"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "video": {
+                                        "properties": {
+                                            "provider": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "youtube",
+                                                    "vimeo"
+                                                ],
+                                                "example": "youtube"
+                                            },
+                                            "link": {
+                                                "type": "string",
+                                                "format": "uri",
+                                                "example": "http://example.com/video"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "unit_price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 29.99
+                                    },
+                                    "is_discounted": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "discount": {
+                                        "properties": {
+                                            "type": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "amount",
+                                                    "percent"
+                                                ],
+                                                "example": "amount"
+                                            },
+                                            "value": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 5.99
+                                            },
+                                            "discount_start_date": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "2023-08-23"
+                                            },
+                                            "discount_end_date": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "2023-09-23"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "current_stock": {
+                                        "type": "integer",
+                                        "format": "int32",
+                                        "example": 100
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Descrição do produto"
+                                    },
+                                    "metatag": {
+                                        "properties": {
+                                            "title": {
+                                                "type": "string",
+                                                "example": "Título da Metatag"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "Descrição da Metatag"
+                                            },
+                                            "image": {
+                                                "type": "string",
+                                                "format": "uri",
+                                                "example": "http://example.com/metatag.jpg"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "low_stock_quantity": {
+                                        "type": "integer",
+                                        "format": "int32",
+                                        "example": 20
+                                    },
+                                    "is_featured": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "is_todays_deal": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "published": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Product Created Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "format": "int32",
+                                            "example": 201
+                                        },
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Produto criado com sucesso"
+                                        },
+                                        "category_id": {
+                                            "type": "integer",
+                                            "format": "int64",
+                                            "example": 123
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "format": "int32",
+                                            "example": 400
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation error"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                },
+                                                "property": null
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "format": "int32",
+                                            "example": 500
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal server error"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/products/{id}": {
             "get": {
                 "tags": [

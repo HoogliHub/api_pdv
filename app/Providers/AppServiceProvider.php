@@ -62,5 +62,17 @@ class AppServiceProvider extends ServiceProvider
 
             return true;
         });
+
+        Validator::extend('valid_keys', function ($attribute, $value, $parameters, $validator) {
+            $allowedKeys = $parameters;
+            $keys = array_keys($value);
+            if (!empty(array_diff($keys, $allowedKeys))) {
+                $validator->addReplacer('valid_keys', function ($message, $attribute, $rule, $parameters) use ($allowedKeys) {
+                    return str_replace(':keys', implode(', ', $allowedKeys), $message);
+                });
+                return false;
+            }
+            return true;
+        });
     }
 }

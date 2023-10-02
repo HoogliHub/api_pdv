@@ -36,6 +36,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/{product}', 'show')->name('show');
         Route::get('/{product}/sold', 'sold')->name('sold');
+        Route::post('/create', 'store')->name('create');
+        Route::put('/{product}', 'update')->name('update');
         Route::delete('/{product}', 'destroy')->name('delete');
     });
     //Orders
@@ -43,6 +45,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/{order}', 'show')->name('show');
         Route::get('/{order}/complete', 'show_details')->name('show.details');
+        Route::post('/create', 'store')->name('create');
+        Route::put('/{order}', 'update')->name('update');
         Route::delete('/{order}', 'destroy')->name('delete');
     });
     //Clients
