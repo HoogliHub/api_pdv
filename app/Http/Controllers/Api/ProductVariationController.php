@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use OpenApi\Annotations as OA;
 use Throwable;
 
@@ -186,9 +187,9 @@ class ProductVariationController extends Controller
      *                 @OA\Property(property="price", type="string", format="float"),
      *                 @OA\Property(property="reference", type="string"),
      *                 @OA\Property(property="stock", type="integer"),
-     *                 @OA\Property(property="type_1", type="string", enum={"Cor", "Tamanho"}),
+     *                 @OA\Property(property="type_1", type="string", enum={"Cor", "Tamanho", "Numeração"}),
      *                 @OA\Property(property="value_1", type="string"),
-     *                 @OA\Property(property="type_2", type="string", enum={"Cor", "Tamanho"}),
+     *                 @OA\Property(property="type_2", type="string", enum={"Cor", "Tamanho", "Numeração"}),
      *                 @OA\Property(property="value_2", type="string")
      *             )
      *         )
@@ -228,18 +229,26 @@ class ProductVariationController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        $availableAttributes = DB::connection('enjoy')->table('attributes as a')->pluck('name')->toArray();
+
         $validator = Validator::make($request->input('Variant'), [
             'price' => 'required|decimal:2|min:0',
             'product_id' => 'required|integer',
             'reference' => 'required|string',
             'stock' => 'required|integer|min:0',
-            'type_1' => 'required|string|in:Cor,Tamanho',
-            'value_1' => 'string',
-            'type_2' => 'required|string|in:Cor,Tamanho',
-            'value_2' => 'string',
+            'type_1' => 'string|in:Cor,' . implode(',', $availableAttributes),
+            'value_1' => [
+                'string',
+                Rule::requiredIf($request->has('Variant.type_1'))
+            ],
+            'type_2' => 'string|in:Cor,' . implode(',', $availableAttributes),
+            'value_2' => [
+                'string',
+                Rule::requiredIf($request->has('Variant.type_2'))
+            ],
         ], [
-            'type_1.in' => 'The type_1 field must be one of the following values: Cor or Tamanho.',
-            'type_2.in' => 'The type_2 field must be one of the following values: Cor or Tamanho.'
+            'type_1.in' => 'The :attribute field must have one of the following values: Cor, ' . implode(', ', $availableAttributes) . '.',
+            'type_2.in' => 'The :attribute field must have one of the following values: Cor, ' . implode(', ', $availableAttributes) . '.'
         ]);
 
         if ($validator->fails()) {
@@ -251,16 +260,84 @@ class ProductVariationController extends Controller
             ], 400);
         }
 
+        $errors_database = [];
+
+        if ($request->has('Variant.type_1') && $request->has('Variant.type_2')) {
+            if ($request->input('Variant.type_1') == 'Cor') {
+                $color = DB::connection('enjoy')->table('colors as c')->where('c.name', '=', $request->input('Variant.value_1'))->first();
+                $attribute = DB::connection('enjoy')->table('attribute_values as av')->where('av.value', '=', $request->input('Variant.value_2'))->first();
+                if (!$color) {
+                    $errors_database['value_1'] = ['There is no data for the given color: ' . $request->input('Variant.value_1')];
+                }
+                if (!$attribute) {
+                    $errors_database['value_2'] = ['There is no data for the given attribute: ' . $request->input('Variant.value_2')];
+                }
+            } elseif ($request->input('Variant.type_2') == 'Cor') {
+                $attribute = DB::connection('enjoy')->table('attribute_values as av')->where('av.value', '=', $request->input('Variant.value_1'))->first();
+                $color = DB::connection('enjoy')->table('colors as c')->where('c.name', '=', $request->input('Variant.value_2'))->first();
+                if (!$attribute) {
+                    $errors_database['value_1'] = ['There is no data for the given attribute: ' . $request->input('Variant.value_1')];
+                }
+                if (!$color) {
+                    $errors_database['value_2'] = ['There is no data for the given color: ' . $request->input('Variant.value_2')];
+                }
+            } else {
+                $attribute1 = DB::connection('enjoy')->table('attribute_values as av')->where('av.value', '=', $request->input('Variant.value_1'))->first();
+                $attribute2 = DB::connection('enjoy')->table('attribute_values as av')->where('av.value', '=', $request->input('Variant.value_2'))->first();
+                if (!$attribute1) {
+                    $errors_database['value_1'] = ['There is no data for the given attribute: ' . $request->input('Variant.value_1')];
+                }
+                if (!$attribute2) {
+                    $errors_database['value_2'] = ['There is no data for the given attribute: ' . $request->input('Variant.value_2')];
+                }
+            }
+        } else {
+            if ($request->has('Variant.type_1')) {
+                if ($request->input('Variant.type_1') == 'Cor') {
+                    $color = DB::connection('enjoy')->table('colors as c')->where('c.name', '=', $request->input('Variant.value_1'))->first();
+                    if (!$color) {
+                        $errors_database['value_1'] = ['There is no data for the given color: ' . $request->input('Variant.value_1')];
+                    }
+                } else {
+                    $attribute = DB::connection('enjoy')->table('attribute_values as av')->where('av.value', '=', $request->input('Variant.value_1'))->first();
+                    if (!$attribute) {
+                        $errors_database['value_1'] = ['There is no data for the given attribute: ' . $request->input('Variant.value_1')];
+                    }
+                }
+            } else {
+                if ($request->input('Variant.type_2') == 'Cor') {
+                    $color = DB::connection('enjoy')->table('colors as c')->where('c.name', '=', $request->input('Variant.value_2'))->first();
+                    if (!$color) {
+                        $errors_database['value_2'] = ['There is no data for the given color: ' . $request->input('Variant.value_2')];
+                    }
+                } else {
+                    $attribute = DB::connection('enjoy')->table('attribute_values as av')->where('av.value', '=', $request->input('Variant.value_2'))->first();
+                    if (!$attribute) {
+                        $errors_database['value_2'] = ['There is no data for the given attribute: ' . $request->input('Variant.value_2')];
+                    }
+                }
+            }
+        }
+
+        if (!empty($errors_database)) {
+            return response()->json([
+                'success' => false,
+                'status' => 400,
+                'message' => 'Validation error',
+                'errors' => $errors_database
+            ], 400);
+        }
+
         try {
             DB::beginTransaction();
 
             $productId = $request->input('Variant.product_id');
 
-            $productExist = DB::connection('enjoy')->table('products as p')
+            $product = DB::connection('enjoy')->table('products as p')
                 ->where('p.id', '=', $productId)
                 ->first();
 
-            if (!$productExist) {
+            if (!$product) {
                 return response()->json([
                     'success' => false,
                     'status' => 400,
@@ -300,7 +377,84 @@ class ProductVariationController extends Controller
                 'qty' => $request->input('Variant.stock'),
             ];
 
+
+            $update_product_variation_data = [];
+
+            $get_attribute = function ($type, $value) {
+                return DB::connection('enjoy')->table('attribute_values as av')
+                    ->where('av.value', '=', $value)
+                    ->first();
+            };
+
+            $process_color_or_attribute = function ($type, $value) use (&$update_product_variation_data, $get_attribute) {
+                if ($type == 'Cor') {
+                    $color = DB::connection('enjoy')->table('colors as c')
+                        ->where('c.name', '=', $value)
+                        ->first();
+                    $update_product_variation_data['colors'] = json_encode([$color->code]);
+                } else {
+                    $attribute = $get_attribute($type, $value);
+                    if (isset($update_product_variation_data['attributes'])) {
+                        $attributes = json_decode($update_product_variation_data['attributes']);
+                        $attributes[] = (string)$attribute->attribute_id;
+                        $update_product_variation_data['attributes'] = json_encode($attributes);
+                    } else {
+                        $update_product_variation_data['attributes'] = json_encode([(string)$attribute->attribute_id]);
+                    }
+                    if (isset($update_product_variation_data['choice_options'])) {
+                        $choice_options = json_decode($update_product_variation_data['choice_options']);
+                        $choice_options[] = [
+                            'attribute_id' => $attribute->attribute_id,
+                            'values' => [$attribute->value]
+                        ];
+                        $update_product_variation_data['choice_options'] = json_encode($choice_options);
+                    } else {
+                        $update_product_variation_data['choice_options'] = json_encode([[
+                            'attribute_id' => $attribute->attribute_id,
+                            'values' => [$attribute->value]
+                        ]]);
+                    }
+                }
+            };
+
+            if ($hasValue1) {
+                $type1 = $request->input('Variant.type_1');
+                $process_color_or_attribute($type1, $request->input('Variant.value_1'));
+            }
+
+            if ($hasValue2) {
+                $type2 = $request->input('Variant.type_2');
+                $process_color_or_attribute($type2, $request->input('Variant.value_2'));
+            }
+
+            $existing_data = [
+                'attributes' => json_decode($product->attributes, true),
+                'choice_options' => json_decode($product->choice_options, true),
+                'colors' => json_decode($product->colors, true),
+            ];
+
+            if (isset($update_product_variation_data['attributes'])) {
+                $attributes = json_decode($update_product_variation_data['attributes'], true);
+                $existing_data['attributes'] = !empty($existing_data['attributes']) ? array_merge($existing_data['attributes'], $attributes) : $attributes;
+            }
+
+            if (isset($update_product_variation_data['choice_options'])) {
+                $choice_options = json_decode($update_product_variation_data['choice_options'], true);
+                $existing_data['choice_options'] = !empty($existing_data['choice_options']) ? array_merge($existing_data['choice_options'], $choice_options) : $choice_options;
+            }
+
+            if (isset($update_product_variation_data['colors'])) {
+                $colors = json_decode($update_product_variation_data['colors'], true);
+                $existing_data['colors'] = !empty($existing_data['colors']) ? array_merge($existing_data['colors'], $colors) : $colors;
+            }
+
             $productStockId = DB::connection('enjoy')->table('product_stocks')->insertGetId($insertVariationData);
+
+            DB::connection('enjoy')->table('products')->where('id', $productId)->update([
+                'attributes' => json_encode($existing_data['attributes']),
+                'choice_options' => json_encode($existing_data['choice_options']),
+                'colors' => json_encode($existing_data['colors']),
+            ]);
 
             DB::commit();
 
@@ -311,7 +465,8 @@ class ProductVariationController extends Controller
                 'message' => 'Product Variation Created Successfully',
                 'variation_id' => $productStockId
             ], 201);
-        } catch (Throwable $th) {
+        } catch
+        (Throwable $th) {
             DB::rollback();
             return response()->json([
                 'success' => false,
@@ -517,8 +672,8 @@ class ProductVariationController extends Controller
             'type_2' => 'string|in:Cor,Tamanho',
             'value_2' => 'string',
         ], [
-            'type_1.in' => 'The type_1 field must be one of the following values: Cor or Tamanho.',
-            'type_2.in' => 'The type_2 field must be one of the following values: Cor or Tamanho.'
+            'type_1.in' => 'The :attribute field must be one of the following values: Cor or Tamanho.',
+            'type_2.in' => 'The :attribute field must be one of the following values: Cor or Tamanho.'
         ]);
 
         if ($validator->fails()) {

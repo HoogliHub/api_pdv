@@ -100,3 +100,24 @@ if (!function_exists('generate_image_urls')) {
         ];
     }
 }
+
+if (!function_exists('generate_random_hex_color')) {
+    /**
+     * Generates a random hexadecimal color code.
+     *
+     * This function creates a random color code in the format #RRGGBB, where RR, GG, and BB are
+     * hexadecimal values representing red, green, and blue channels respectively.
+     *
+     * @return string The generated hexadecimal color code.
+     */
+    function generate_random_hex_color(): string
+    {
+        $rand = array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f');
+        $color = '#' . $rand[rand(0, 15)] . $rand[rand(0, 15)] . $rand[rand(0, 15)] . $rand[rand(0, 15)] . $rand[rand(
+                0,
+                15
+            )] . $rand[rand(0, 15)];
+
+        return strtoupper($color);
+    }
+}
