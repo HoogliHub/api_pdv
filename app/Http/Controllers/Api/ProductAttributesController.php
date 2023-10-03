@@ -354,7 +354,7 @@ class ProductAttributesController extends Controller
                 'status' => 400,
                 'message' => 'Validation error',
                 'errors' => [
-                    'name' => [
+                    'attribute_id' => [
                         'There is no record with the given attribute_id: ' . $request->input('AttributeValue.attribute_id')
                     ]
                 ]

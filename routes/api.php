@@ -90,6 +90,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{coupon}', 'update')->name('update');
         Route::delete('/{coupon}', 'destroy')->name('delete');
     });
+    //Colors
+    Route::controller('App\Http\Controllers\Api\ColorsController')->prefix('colors')->name('colors.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/{color}', 'show')->name('show');
+        Route::post('/create', 'store')->name('create');
+        Route::put('/{color}', 'update')->name('update');
+        Route::delete('/{color}', 'destroy')->name('delete');
+    });
 
     //User
     Route::controller('App\Http\Controllers\Api\AuthController')->group(function () {
