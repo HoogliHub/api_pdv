@@ -7,7 +7,10 @@ use App\Services\EnjoyUrlService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use OpenApi\Annotations as OA;
+use Throwable;
 use function response;
 
 class OrderController extends Controller
@@ -208,10 +211,234 @@ class OrderController extends Controller
         ], 200);
     }
 
-    //TODO
-    public function store(Request $request)
+    /**
+     * @OA\Post(
+     *     path="/api/orders",
+     *     summary="Create a new order",
+     *     tags={"Orders"},
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"user_id", "shipping_address_id", "delivery_status", "payment_type", "payment_status", "grand_total", "details"},
+     *             @OA\Property(property="user_id", type="integer", description="User ID"),
+     *             @OA\Property(property="shipping_address_id", type="integer", description="Delivery address ID"),
+     *             @OA\Property(property="delivery_status", type="string", enum={"pending", "delivered", "confirmed", "cancelled", "on_the_way"}, description="Delivery status"),
+     *             @OA\Property(property="payment_type", type="string", description="Type of payment"),
+     *             @OA\Property(property="payment_status", type="string", enum={"paid", "unpaid"}, description="Payment status"),
+     *             @OA\Property(property="payment_details", type="array", @OA\Items(type="string"), description="Payment details (optional)"),
+     *             @OA\Property(property="grand_total", type="number", format="float", description="Grand total"),
+     *             @OA\Property(property="coupon_discount", type="number", format="float", description="Coupon discount"),
+     *             @OA\Property(property="code", type="string", description="Code (optional)"),
+     *             @OA\Property(property="tracking_code", type="string", description="Tracking code (optional)"),
+     *             @OA\Property(property="date", type="string", format="date", description="Date in format (YYYY-MM-DD)"),
+     *             @OA\Property(property="ids_traking", type="string", description="Tracking IDs (optional)"),
+     *             @OA\Property(property="url_traking", type="string", format="url", description="Tracking URL (optional)"),
+     *             @OA\Property(property="details", type="array", @OA\Items(
+     *                 @OA\Property(property="product_id", type="integer", description="Product ID"),
+     *                 @OA\Property(property="variation", type="string", description="Variation"),
+     *                 @OA\Property(property="quantity", type="integer", description="Quantity")
+     *             ), description="Order details")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Order created successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="code", type="integer", example=201),
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Ordem criada com sucesso"),
+     *             @OA\Property(property="order_id", type="integer", example=123)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="status", type="integer", example=400),
+     *             @OA\Property(property="message", type="string", example="Erro de validação"),
+     *             @OA\Property(property="errors", type="object", example={"user_id": {"O campo user_id é obrigatório."}})
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="status", type="integer", example=500),
+     *             @OA\Property(property="message", type="string", example="Erro interno do servidor"),
+     *             @OA\Property(property="error", type="string", example="Mensagem de erro detalhada")
+     *         )
+     *     )
+     * )
+     */
+    public function store(Request $request): JsonResponse
     {
-        //
+
+        $validator = Validator::make($request->input('Order'), [
+            'user_id' => 'required|integer',
+            'shipping_address_id' => 'required|integer',
+            'delivery_status' => 'required|string|in:pending,delivered,confirmed,cancelled,on_the_way',
+            'payment_type' => 'required|string',
+            'payment_status' => 'required|string|in:paid,unpaid',
+            'payment_details' => [
+                'array',
+                Rule::requiredIf($request->input('Order.payment_status') == 'paid')
+            ],
+            'grand_total' => 'required|decimal:2',
+            'coupon_discount' => 'decimal:2',
+            'code' => [
+                'string',
+                Rule::requiredIf($request->input('Order.payment_status') == 'paid')
+            ],
+            'tracking_code' => 'string',
+            'date' => 'required|date_format:Y-m-d',
+            'ids_traking' => 'string',
+            'url_traking' => 'url:http,https',
+            'details' => 'required|array',
+            'details.*.product_id' => 'required|integer',
+            'details.*.variation' => 'required|string',
+            'details.*.quantity' => 'required|integer'
+        ], [
+            'delivery_status.in' => 'The :attribute field must be one of the following values: PENDING,DELIVERED,CONFIRMED,CANCELLED or ON_THE_WAY',
+            'payment_status.in' => 'The :attribute field must be one of the following values: PAID or UNPAID',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'status' => 400,
+                'message' => 'Validation error',
+                'errors' => $validator->errors()
+            ], 400);
+        }
+
+        $user = DB::connection('enjoy')->table('users as u')
+            ->where('u.id', '=', $request->input('Order.user_id'))
+            ->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'status' => 400,
+                'message' => 'Validation error',
+                'errors' => [
+                    'user_id' => [
+                        'There is no user with the given user_id: ' . $request->input('Order.user_id')
+                    ]
+                ]
+            ], 400);
+        }
+
+        $address = DB::connection('enjoy')->table('addresses as a')
+            ->select('a.address', 'a.correios', 'a.postal_code', 'a.phone', 'a.valor_correios')
+            ->addSelect('c.name as country')
+            ->addSelect('s.name as state')
+            ->addSelect('c1.name as city')
+            ->addSelect('u.name', 'u.email')
+            ->leftJoin('countries as c', 'a.country_id', '=', 'c.id')
+            ->leftJoin('states as s', 'a.state_id', '=', 's.id')
+            ->leftJoin('cities as c1', 'a.city_id', '=', 'c1.id')
+            ->leftJoin('users as u', 'a.user_id', '=', 'u.id')
+            ->where('a.id', '=', $request->input('Order.shipping_address_id'))
+            ->first();
+
+        if (!$address) {
+            return response()->json([
+                'success' => false,
+                'status' => 400,
+                'message' => 'Validation error',
+                'errors' => [
+                    'shipping_address_id' => [
+                        'There is no address with the given shipping_address_id: ' . $request->input('Order.shipping_address_id')
+                    ]
+                ]
+            ], 400);
+        }
+
+        $errors_database = [];
+
+        foreach ($request->input('Order.details') as $key => $item) {
+            $product = DB::connection('enjoy')->table('products')->where('id', '=', $item['product_id'])->first();
+            if (!$product) {
+                $errors_database['details.' . $key . '.product_id'] = [
+                    'There is no product with the given product_id: ' . $item['product_id']
+                ];
+            }
+        }
+
+        if (!empty($errors_database)) {
+            return response()->json([
+                'success' => false,
+                'status' => 400,
+                'message' => 'Validation error',
+                'errors' => $errors_database
+            ], 400);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $combined_orders = DB::connection('enjoy')->table('combined_orders')->insertGetId([
+                'user_id' => $request->input('Order.user_id'),
+                'shipping_address' => json_encode($address),
+                'grand_total' => (float)$request->input('Order.grand_total')
+            ]);
+
+            $order = DB::connection('enjoy')->table('orders')->insertGetId([
+                'combined_order_id' => $combined_orders,
+                'user_id' => $request->input('Order.user_id'),
+                'seller_id' => 9,
+                'shipping_address' => json_encode($address),
+                'shipping_type' => 'carrier',
+                'delivery_status' => strtolower($request->input('Order.delivery_status')),
+                'payment_type' => $request->input('Order.payment_type'),
+                'payment_status' => strtolower($request->input('Order.payment_status')),
+                'payment_details' => $request->has('Order.payment_details') ? json_encode($request->input('Order.payment_details')) : null,
+                'grand_total' => (float)$request->input('Order.grand_total'),
+                'coupon_discount' => $request->has('Order.coupon_discount') ? (float)$request->input('Order.coupon_discount') : 0.00,
+                'code' => $request->has('Order.code') ? $request->input('Order.code') : null,
+                'tracking_code' => $request->has('Order.tracking_code') ? $request->input('Order.tracking_code') : null,
+                'date' => strtotime($request->input('Order.date')),
+                'ids_traking' => $request->has('Order.ids_traking') ? $request->input('Order.ids_traking') : null,
+                'url_traking' => $request->has('Order.url_traking') ? $request->input('Order.url_traking') : null
+            ]);
+
+            foreach ($request->input('Order.details') as $item) {
+                $product = DB::connection('enjoy')->table('products')->where('id', '=', $item['product_id'])->first();
+                DB::connection('enjoy')->table('order_details')->insert([
+                    'order_id' => $order,
+                    'seller_id' => 9,
+                    'product_id' => $item['product_id'],
+                    'variation' => $item['variation'],
+                    'price' => $product->unit_price,
+                    'shipping_cost' => $address->valor_correios ?? 0.00,
+                    'quantity' => $item['quantity'],
+                    'payment_status' => strtolower($request->input('Order.payment_status')),
+                    'delivery_status' => strtolower($request->input('Order.delivery_status')),
+                    'shipping_type' => 'carrier'
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'code' => 201,
+                'status' => true,
+                'message' => 'Order Created Successfully',
+                'order_id' => $order
+            ], 201);
+        } catch (Throwable $th) {
+            DB::rollback();
+            return response()->json([
+                'success' => false,
+                'status' => 500,
+                'message' => 'Internal server error',
+                'error' => $th->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -693,12 +920,257 @@ class OrderController extends Controller
         }
     }
 
-    //TODO
-    public function update(Request $request, string $id)
+    /**
+     * @OA\Put(
+     *     path="/api/orders/{id}",
+     *     summary="Update an existing order",
+     *     tags={"Orders"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the order to be updated",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(
+     *             type="object",
+     *              @OA\Property(property="user_id", type="integer", description="User ID"),
+    *               @OA\Property(property="shipping_address_id", type="integer", description="Delivery address ID"),
+     *              @OA\Property(property="delivery_status", type="string", enum={"pending", "delivered", "confirmed", "cancelled", "on_the_way"}, description="Delivery status"),
+     *              @OA\Property(property="payment_type", type="string", description="Type of payment"),
+     *              @OA\Property(property="payment_status", type="string", enum={"paid", "unpaid"}, description="Payment status"),
+     *              @OA\Property(property="payment_details", type="array", @OA\Items(type="string"), description="Payment details (optional)"),
+     *              @OA\Property(property="grand_total", type="number", format="float", description="Grand total"),
+     *              @OA\Property(property="coupon_discount", type="number", format="float", description="Coupon discount"),
+     *              @OA\Property(property="code", type="string", description="Code (optional)"),
+     *              @OA\Property(property="tracking_code", type="string", description="Tracking code (optional)"),
+     *              @OA\Property(property="date", type="string", format="date", description="Date in format (YYYY-MM-DD)"),
+     *              @OA\Property(property="ids_traking", type="string", description="Tracking IDs (optional)"),
+     *              @OA\Property(property="url_traking", type="string", format="url", description="Tracking URL (optional)"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Order updated successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="code", type="integer", example=201),
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Ordem atualizada com sucesso"),
+     *             @OA\Property(property="order_id", type="integer", example=123)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="status", type="integer", example=400),
+     *             @OA\Property(property="message", type="string", example="Erro de validação"),
+     *             @OA\Property(property="errors", type="object", example={"user_id": {"O campo user_id é obrigatório."}})
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Order not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="status", type="integer", example=404),
+     *             @OA\Property(property="data", type="object", example={}),
+     *             @OA\Property(property="message", type="string", example="Não há dados para o ID fornecido.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="status", type="integer", example=500),
+     *             @OA\Property(property="message", type="string", example="Erro interno do servidor"),
+     *             @OA\Property(property="error", type="string", example="Mensagem de erro detalhada")
+     *         )
+     *     )
+     * )
+     */
+    public function update(Request $request, string $id): JsonResponse
     {
-        //
-    }
+        $validator = Validator::make($request->input('Order'), [
+            'user_id' => 'integer',
+            'shipping_address_id' => 'integer',
+            'delivery_status' => 'string|in:pending,delivered,confirmed,cancelled,on_the_way',
+            'payment_type' => 'string',
+            'payment_status' => 'string|in:paid,unpaid',
+            'payment_details' => [
+                'array',
+                Rule::requiredIf($request->input('Order.payment_status') == 'paid')
+            ],
+            'grand_total' => 'decimal:2',
+            'coupon_discount' => 'decimal:2',
+            'code' => [
+                'string',
+                Rule::requiredIf($request->input('Order.payment_status') == 'paid')
+            ],
+            'tracking_code' => 'string',
+            'date' => 'date_format:Y-m-d',
+            'ids_traking' => 'string',
+            'url_traking' => 'url:http,https'
+        ], [
+            'delivery_status.in' => 'The :attribute field must be one of the following values: PENDING,DELIVERED,CONFIRMED,CANCELLED or ON_THE_WAY',
+            'payment_status.in' => 'The :attribute field must be one of the following values: PAID or UNPAID',
+        ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'status' => 400,
+                'message' => 'Validation error',
+                'errors' => $validator->errors()
+            ], 400);
+        }
+
+        $user = DB::connection('enjoy')->table('users as u')
+            ->where('u.id', '=', $request->input('Order.user_id'))
+            ->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'status' => 400,
+                'message' => 'Validation error',
+                'errors' => [
+                    'user_id' => [
+                        'There is no user with the given user_id: ' . $request->input('Order.user_id')
+                    ]
+                ]
+            ], 400);
+        }
+
+        $address = DB::connection('enjoy')->table('addresses as a')
+            ->select('a.address', 'a.correios', 'a.postal_code', 'a.phone', 'a.valor_correios')
+            ->addSelect('c.name as country')
+            ->addSelect('s.name as state')
+            ->addSelect('c1.name as city')
+            ->addSelect('u.name', 'u.email')
+            ->leftJoin('countries as c', 'a.country_id', '=', 'c.id')
+            ->leftJoin('states as s', 'a.state_id', '=', 's.id')
+            ->leftJoin('cities as c1', 'a.city_id', '=', 'c1.id')
+            ->leftJoin('users as u', 'a.user_id', '=', 'u.id')
+            ->where('a.id', '=', $request->input('Order.shipping_address_id'))
+            ->first();
+
+        if (!$address) {
+            return response()->json([
+                'success' => false,
+                'status' => 400,
+                'message' => 'Validation error',
+                'errors' => [
+                    'shipping_address_id' => [
+                        'There is no address with the given shipping_address_id: ' . $request->input('Order.shipping_address_id')
+                    ]
+                ]
+            ], 400);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $order = DB::connection('enjoy')->table('orders as o')
+                ->where('o.id', '=', $id);
+
+            if ($order) {
+                $update_combined_orders_data = [
+                    'updated_at' => now()
+                ];
+
+                if ($request->has('Order.user_id')) {
+                    $update_combined_orders_data['user_id'] = $request->input('Order.user_id');
+                }
+                if ($request->has('Order.shipping_address_id')) {
+                    $update_combined_orders_data['shipping_address'] = json_encode($address);
+                }
+                if ($request->has('Order.grand_total')) {
+                    $update_combined_orders_data['grand_total'] = (float)$request->input('Order.grand_total');
+                }
+
+                $combined_orders = DB::connection('enjoy')->table('combined_orders')
+                    ->where('id', '=', $order->first('combined_order_id')->combined_order_id)
+                    ->update($update_combined_orders_data);
+
+                $update_order_data = [
+                    'updated_at' => now()
+                ];
+
+                if ($request->has('Order.user_id')) {
+                    $update_order_data['user_id'] = $request->input('Order.user_id');
+                }
+                if ($request->has('Order.shipping_address_id')) {
+                    $update_order_data['shipping_address'] = json_encode($address);
+                }
+                if ($request->has('Order.delivery_status')) {
+                    $update_order_data['delivery_status'] = strtolower($request->input('Order.delivery_status'));
+                }
+                if ($request->has('Order.payment_type')) {
+                    $update_order_data['payment_type'] = $request->input('Order.payment_type');
+                }
+                if ($request->has('Order.payment_status')) {
+                    $update_order_data['payment_status'] = strtolower($request->input('Order.payment_status'));
+                }
+                if ($request->has('Order.payment_details')) {
+                    $update_order_data['payment_details'] = json_encode($request->input('Order.payment_details'));
+                }
+                if ($request->has('Order.grand_total')) {
+                    $update_order_data['grand_total'] = (float)$request->input('Order.grand_total');
+                }
+                if ($request->has('Order.coupon_discount')) {
+                    $update_order_data['coupon_discount'] = (float)$request->input('Order.coupon_discount');
+                }
+                if ($request->has('Order.code')) {
+                    $update_order_data['code'] = $request->input('Order.code');
+                }
+                if ($request->has('Order.tracking_code')) {
+                    $update_order_data['tracking_code'] = $request->input('Order.tracking_code');
+                }
+                if ($request->has('Order.date')) {
+                    $update_order_data['date'] = strtotime($request->input('Order.date'));
+                }
+                if ($request->has('Order.ids_traking')) {
+                    $update_order_data['ids_traking'] = $request->input('Order.ids_traking');
+                }
+                if ($request->has('Order.url_traking')) {
+                    $update_order_data['url_traking'] = $request->input('Order.url_traking');
+                }
+
+                $order->update($update_order_data);
+
+                DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'code' => 201,
+                    'status' => true,
+                    'message' => 'Order Updated Successfully',
+                    'category_id' => $order->first()->id
+                ], 201);
+            } else {
+                return response()->json([
+                    'success' => true,
+                    'status' => 404,
+                    'data' => [],
+                    'message' => 'There is no data for the given ID.'
+                ], 404);
+            }
+
+        } catch (Throwable $th) {
+            DB::rollback();
+            return response()->json([
+                'success' => false,
+                'status' => 500,
+                'message' => 'Internal server error',
+                'error' => $th->getMessage()
+            ], 500);
+        }
+    }
 
     /**
      * @OA\Delete(
