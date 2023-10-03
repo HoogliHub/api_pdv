@@ -216,6 +216,7 @@ class OrderController extends Controller
      *     path="/api/orders",
      *     summary="Create a new order",
      *     tags={"Orders"},
+     *     security={{ "bearerAuth": {} }},
      *     @OA\RequestBody(
      *         @OA\JsonContent(
      *             type="object",
@@ -925,6 +926,7 @@ class OrderController extends Controller
      *     path="/api/orders/{id}",
      *     summary="Update an existing order",
      *     tags={"Orders"},
+     *     security={{ "bearerAuth": {} }},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
